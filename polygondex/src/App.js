@@ -6,6 +6,7 @@ import { Button } from '@material-ui/core';
 import { useMoralis } from 'react-moralis';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { XGrid } from '@material-ui/x-grid';
+const axios = require('axios');
 
 
 const useStyles = makeStyles({
@@ -18,6 +19,74 @@ const useStyles = makeStyles({
   welcomeMsg: {
     margin: '12px',
     textAlign: 'center'
+  },
+  tableContainer: {
+    border: '1px solid var(--box-border-color)',
+    background: 'var(--box-bg-color)',
+    borderRadius: '10px',
+    margin: '12px',
+    padding: '5px',
+    boxShadow: '3px 3px 3px #000',
+    width: '33%',
+    display: 'inline-block',
+  },
+  genTable: {
+    width: '100%'
+  },
+  tableHeader: {
+    padding: '7px',
+    margin: '1px',
+    background: '#000',
+    borderRadius: '7px 7px 0 0',
+    fontSize: '16px',
+    lineHeight: '27px',
+    minWidth: '270px',
+  },
+  tdPriceChg: {
+    width: '75px',
+    borderTop: '1px dotted #656565',
+    padding: '5px 4px 5px 5px'
+  },
+  dashPriceChg: {
+
+  },
+  gainNum: {
+    color: '#02C079'
+  },
+  negNum: {
+    color: 'red'
+  },
+  dashPrice: {
+    textAlign: 'right',
+    whiteSpace: 'nowrap'
+  },
+  tdTokenData: {
+    borderTop: '1px dotted #656565',
+    padding: '5px 4px 5px 5px'
+  },
+  tokenSymbol: {
+    color: '#97dfff'
+  },
+  dashVol: {
+
+  },
+  tdTVL24: {
+    borderTop: '1px dotted #656565',
+    padding: '5px 4px 5px 5px'
+  },
+  totValLocked: {
+
+  },
+  tvlChange: {
+
+  },
+  tdTVLTitle: {
+    borderTop: '1px dotted #656565',
+    padding: '5px 4px 5px 5px'
+  },
+  tvl: {
+    writingMode: 'vertical-rl',
+    textOrientation: 'upright',
   }
 });
 
@@ -25,6 +94,9 @@ export default function App() {
   const classes = useStyles();
   const [chainData, setChainData] = React.useState([]);
   const { authenticate, isAuthenticated, user, Moralis, logout, isInitialized } = useMoralis();
+  const [pDexData, setPDexData] = React.useState([]);
+  const [gainersSortedData, setGainersSortedData] = React.useState([]);
+  const [losersSortedData, setLosersSortedData] = React.useState([]);
   console.log(isInitialized);
 
   const displayUserName = () => {
@@ -55,50 +127,168 @@ export default function App() {
     }
   };
 
+  const getPDEXData = () => {
+    axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1')
+    .then(function (response) {
+      // handle success
+      console.log(response);
+      setGainersSortedData([...response.data.sort((a, b) => {
+        if (a.Price_PctChg_24hr > b.Price_PctChg_24hr) {
+          return -1;
+        }
+        if (a.Price_PctChg_24hr < b.Price_PctChg_24hr) {
+          return 1;
+        }
+        // a must be equal to b
+        return 0;
+      })])
+      setLosersSortedData([...response.data.sort((a, b) => {
+        if (a.Price_PctChg_24hr < b.Price_PctChg_24hr) {
+          return -1;
+        }
+        if (a.Price_PctChg_24hr > b.Price_PctChg_24hr) {
+          return 1;
+        }
+        // a must be equal to b
+        return 0;
+      })])
+      setPDexData(response.data);
+    })
+    .catch(function (error) {
+      // handle error
+      console.log(error);
+    })
+    .then(function () {
+      // always executed
+    });
+  }
+  if (!pDexData.length) getPDEXData()
+
   console.log(chainData);
 
-  // function createData(
-  //   block_hash: string,
-  //   block_number: string,
-  //   block_timestamp: string,
-  //   confirmed: string,
-  //   createdAt: string,
-  //   from_address: string,
-  //   gas: string,
-  //   gas_price: string,
-  //   hash: string,
-  //   input: string,
-  //   nonce: string,
-  //   receipt_contract_address: string,
-  //   receipt_contract_address: string,
-  //   receipt_cumulative_gas_used: string,
-  //   receipt_gas_used: string,
-  //   receipt_root: string,
-  //   receipt_status: string,
-  //   to_address: string,
-  //   transaction_index: string
-  // ) {
-  //   return {
-  //     block_hash,
-  //     block_number,
-  //     block_timestamp,
-  //     confirmed,
-  //     createdAt,
-  //     from_address,
-  //     gas,
-  //     gas_price,
-  //     hash,
-  //     input,
-  //     nonce,
-  //     receipt_contract_address,
-  //     receipt_cumulative_gas_used,
-  //     receipt_gas_used,
-  //     receipt_root,
-  //     receipt_status,
-  //     to_address,
-  //     transaction_index
-  //   };
-  // }
+  const renderTable = () => {
+    if (!pDexData.length) return null;
+    let isApeMode = false;
+
+    if (!isApeMode) {
+      return (
+          <div className={classes.tableContainer}>
+
+            <h2 className={classes.tableHeader}>
+              <i className="fa fa-arrow-circle-up" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}></i>
+              Top Gainers (24hrs)
+            </h2>
+            <table className={classes.genTable}>
+              <tbody>
+              {
+                gainersSortedData.map((rToken, index) => {
+                  //TODO: need this method
+                  // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+
+                  let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
+                  // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
+                  let tokenSymbol = (rToken.mdtTokenSymbol == "MATIC" || rToken.mdtTokenSymbol == "WMATIC") ? "USDC" : "MATIC"
+                  let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
+                  let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
+                  let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
+                  console.log(rToken)
+                  return <tr>
+
+                    <td className={classes.tdPriceChg}>
+                      <div className={classes.dashPriceChg}>
+                        <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{priceChange}%</div>
+                      </div>
+                      <div className={classes.dashPrice}>{rToken.current_mstbePrice}</div>
+                    </td>
+                    <td className={classes.tdTokenData}>
+                      <div className={classes.tokenSymbol}>
+                        {rToken.mdtTokenSymbol}
+                      </div>
+                      <div className={classes.dashVol}>vol: {rToken.VolumeUSD_24hr}</div>
+                    </td>
+                    <td className={classes.tdTVL24}>
+                      <div className={classes.totValLocked}>
+                        {rToken.current_TVL_USD}
+                      </div>
+                      <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>{rToken.TVL_USD_24hr}</div>
+                    </td>
+                    <td className={classes.tdTVLTitle}>
+                      <div className={classes.tvl}>
+                        TVL
+                      </div>
+                    </td>
+
+                  </tr>
+                })
+              }
+              </tbody>
+            </table>
+          </div>
+      )
+    }
+  }
+
+  const renderLosersTable = () => {
+    if (!pDexData.length) return null;
+    let isApeMode = false;
+
+    if (!isApeMode) {
+      return (
+          <div className={classes.tableContainer}>
+
+            <h2 className={classes.tableHeader}>
+              <i className="fa fa-arrow-circle-down" style={{color:'red', margin:'4px 8px', fontSize: '20px'}}></i>
+              Top Gainers (24hrs)
+            </h2>
+            <table className={classes.genTable}>
+              <tbody>
+              {
+                losersSortedData.map((rToken, index) => {
+                  //TODO: need this method
+                  // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+
+                  let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
+                  // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
+                  let tokenSymbol = (rToken.mdtTokenSymbol == "MATIC" || rToken.mdtTokenSymbol == "WMATIC") ? "USDC" : "MATIC"
+                  let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
+                  let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
+                  let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
+                  console.log(rToken)
+                  return <tr>
+
+                    <td className={classes.tdPriceChg}>
+                      <div className={classes.dashPriceChg}>
+                        <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{priceChange}%</div>
+                      </div>
+                      <div className={classes.dashPrice}>{rToken.current_mstbePrice}</div>
+                    </td>
+                    <td className={classes.tdTokenData}>
+                      <div className={classes.tokenSymbol}>
+                        {rToken.mdtTokenSymbol}
+                      </div>
+                      <div className={classes.dashVol}>vol: {rToken.VolumeUSD_24hr}</div>
+                    </td>
+                    <td className={classes.tdTVL24}>
+                      <div className={classes.totValLocked}>
+                        {rToken.current_TVL_USD}
+                      </div>
+                      <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>{rToken.TVL_USD_24hr}</div>
+                    </td>
+                    <td className={classes.tdTVLTitle}>
+                      <div className={classes.tvl}>
+                        TVL
+                      </div>
+                    </td>
+
+                  </tr>
+                })
+              }
+              </tbody>
+            </table>
+          </div>
+      )
+    }
+  }
 
   const columns = [
     { title: 'block_hash', field: 'block_hash' },
@@ -121,17 +311,6 @@ export default function App() {
     { title: 'transaction_index', field: 'transaction_index' }
   ];
 
-  // const renderGraph = () => {
-  //   if (mockData.length) {
-  //     return (
-  //       <Card style={{ backgroundColor: 'rgb(55 53 53)', width: 'fit-content', margin: '24px auto' }}>
-  //         <Chart data={mockData} />
-  //       </Card>
-  //     );
-  //   } else {
-  //     return null;
-  //   }
-  // };
   return (
     <div className={'primaryBackground'}>
       <NavBar />
@@ -159,24 +338,8 @@ export default function App() {
       </div>
 
       {/*{renderGraph()}*/}
+      {renderTable()}
+      {renderLosersTable()}
     </div>
   );
 }
-// block_hash: "0x7ddfd0777a0486b1a386e130ba8cf3d3cda129a635a5bc09cd7ab8ffd7d0d07a"
-// block_number: 3095103
-// block_timestamp: Mon Dec 14 2020 10:19:38 GMT-0600 (Central Standard Time) {}
-// confirmed: true
-// createdAt: Thu Jul 08 2021 15:20:02 GMT-0500 (Central Daylight Time) {}
-// from_address: "0xc572779d7839b998df24fc316c89bed3d450ed13"
-// gas: 27753
-// gas_price: 20000000000
-// hash: "0x914827f71c7bc395a0e0bc5d6187aa33fa12c89b2e81479e80f60f6c7bb09edb"
-// input: "0x095ea7b300000000000000000000000005ff2b0db69458a0750badebc4f9e13add608c7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-// nonce: 2
-// receipt_contract_address: null
-// receipt_cumulative_gas_used: 872046
-// receipt_gas_used: 25230
-// receipt_root: null
-// receipt_status: 1
-// to_address: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82"
-// transaction_index: 3
