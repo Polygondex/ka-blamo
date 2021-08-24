@@ -27,6 +27,7 @@ export default function App() {
   const { authenticate, isAuthenticated, user, Moralis, logout, isInitialized } = useMoralis();
   console.log(isInitialized);
 
+
   const displayUserName = () => {
     if (!isAuthenticated) return '...Please connect MetaMask with Authenticate Button';
     return user.get('username');
