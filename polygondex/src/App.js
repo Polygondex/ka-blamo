@@ -70,6 +70,7 @@ export default function App() {
   //   input: string,
   //   nonce: string,
   //   receipt_contract_address: string,
+  //   receipt_contract_address: string,
   //   receipt_cumulative_gas_used: string,
   //   receipt_gas_used: string,
   //   receipt_root: string,
