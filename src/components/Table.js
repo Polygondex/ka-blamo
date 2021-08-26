@@ -89,6 +89,10 @@ const useStyles = makeStyles({
   }
 });
 
+const kFormatter = (num) => {
+  return Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k' : Math.sign(num)*Math.abs(num)
+}
+
 const Table = ({filteredTableData, tableHeaderData}) => {
   const classes = useStyles();
   const [tableData] = React.useState(filteredTableData);
@@ -174,13 +178,13 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                   <div className={classes.tokenSymbol}>
                     {rToken.mdtTokenSymbol}
                   </div>
-                  <div className={classes.dashVol}>vol: ${rToken.VolumeUSD_24hr}</div>
+                  <div className={classes.dashVol}>vol: ${kFormatter(rToken.VolumeUSD_24hr)}</div>
                 </td>
                 <td className={classes.tdTVL24}>
                   <div className={classes.totValLocked}>
-                    ${rToken.current_TVL_USD}
+                    ${kFormatter(rToken.current_TVL_USD)}
                   </div>
-                  <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>${rToken.TVL_USD_24hr}</div>
+                  <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>${kFormatter(rToken.TVL_USD_24hr)}</div>
                 </td>
                 <td className={classes.tdTVLTitle}>
                   <div className={classes.tvl}>
