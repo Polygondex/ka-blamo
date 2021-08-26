@@ -21,8 +21,8 @@ const useStyles = makeStyles({
     textAlign: 'center'
   },
   tableContainer: {
-    border: '1px solid var(--box-border-color)',
-    background: 'var(--box-bg-color)',
+    border: '1px solid #a59393',
+    background: 'black',
     borderRadius: '10px',
     margin: '12px',
     padding: '5px',
@@ -31,7 +31,8 @@ const useStyles = makeStyles({
     display: 'inline-block',
   },
   genTable: {
-    width: '100%'
+    width: '100%',
+    tableLayout: 'fixed'
   },
   tableHeader: {
     padding: '7px',
@@ -43,12 +44,12 @@ const useStyles = makeStyles({
     minWidth: '270px',
   },
   tdPriceChg: {
-    width: '75px',
+    width: '25%',
     borderTop: '1px dotted #656565',
     padding: '5px 4px 5px 5px'
   },
   dashPriceChg: {
-
+    color: 'white'
   },
   gainNum: {
     color: '#02C079'
@@ -57,36 +58,42 @@ const useStyles = makeStyles({
     color: 'red'
   },
   dashPrice: {
-    textAlign: 'right',
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    color: 'white'
   },
   tdTokenData: {
     borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px'
+    padding: '5px 4px 5px 5px',
+    color: 'white',
+    width: '33%'
   },
   tokenSymbol: {
     color: '#97dfff'
   },
   dashVol: {
-
+    color: 'white'
   },
   tdTVL24: {
     borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px'
+    padding: '5px 4px 5px 5px',
+    color: 'white',
+    width: '33%'
   },
   totValLocked: {
-
+    color: 'white'
   },
   tvlChange: {
-
+    color: 'white'
   },
   tdTVLTitle: {
     borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px'
+    padding: '5px 4px 5px 5px',
+    width: '5%'
   },
   tvl: {
     writingMode: 'vertical-rl',
     textOrientation: 'upright',
+    color: 'white'
   }
 });
 
