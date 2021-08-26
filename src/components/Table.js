@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     boxShadow: '3px 3px 3px #000',
     width: '30%',
     display: 'inline-block',
-    height: '500px',
+    height: '600px',
     position: 'relative',
     overflow: 'scroll',
   },
