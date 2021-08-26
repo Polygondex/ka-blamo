@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import NavBar from './layout/NavBar';
 
@@ -6,6 +6,8 @@ import { Button } from '@material-ui/core';
 import { useMoralis } from 'react-moralis';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { XGrid } from '@material-ui/x-grid';
+import Table from "./components/Table";
+import * as TableHeaderEnum from "./enums/TableHeaderEnum";
 const axios = require('axios');
 
 
@@ -20,81 +22,6 @@ const useStyles = makeStyles({
     margin: '12px',
     textAlign: 'center'
   },
-  tableContainer: {
-    border: '1px solid #a59393',
-    background: 'black',
-    borderRadius: '10px',
-    margin: '12px',
-    padding: '5px',
-    boxShadow: '3px 3px 3px #000',
-    width: '33%',
-    display: 'inline-block',
-  },
-  genTable: {
-    width: '100%',
-    tableLayout: 'fixed'
-  },
-  tableHeader: {
-    padding: '7px',
-    margin: '1px',
-    background: '#000',
-    borderRadius: '7px 7px 0 0',
-    fontSize: '16px',
-    lineHeight: '27px',
-    minWidth: '270px',
-  },
-  tdPriceChg: {
-    width: '25%',
-    borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px'
-  },
-  dashPriceChg: {
-    color: 'white'
-  },
-  gainNum: {
-    color: '#02C079'
-  },
-  negNum: {
-    color: 'red'
-  },
-  dashPrice: {
-    whiteSpace: 'nowrap',
-    color: 'white'
-  },
-  tdTokenData: {
-    borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px',
-    color: 'white',
-    width: '33%'
-  },
-  tokenSymbol: {
-    color: '#97dfff'
-  },
-  dashVol: {
-    color: 'white'
-  },
-  tdTVL24: {
-    borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px',
-    color: 'white',
-    width: '33%'
-  },
-  totValLocked: {
-    color: 'white'
-  },
-  tvlChange: {
-    color: 'white'
-  },
-  tdTVLTitle: {
-    borderTop: '1px dotted #656565',
-    padding: '5px 4px 5px 5px',
-    width: '5%'
-  },
-  tvl: {
-    writingMode: 'vertical-rl',
-    textOrientation: 'upright',
-    color: 'white'
-  }
 });
 
 export default function App() {
@@ -102,9 +29,18 @@ export default function App() {
   const [chainData, setChainData] = React.useState([]);
   const { authenticate, isAuthenticated, user, Moralis, logout, isInitialized } = useMoralis();
   const [pDexData, setPDexData] = React.useState([]);
-  const [gainersSortedData, setGainersSortedData] = React.useState([]);
-  const [losersSortedData, setLosersSortedData] = React.useState([]);
-  console.log(isInitialized);
+  const [gainers24HRSortedData, setGainers24HRSortedData] = React.useState([]);
+  const [gainers10MINSortedData, setGainers10MINSortedData] = React.useState([]);
+  const [losers24HRSortedData, setLosers24HRSortedData] = React.useState([]);
+  const [tvlGainers24HRSortedData, setTVLGainers24HRSortedData] = React.useState([]);
+  const [tvlLosers24HRSortedData, setTVLLosers24HRSortedData] = React.useState([]);
+  const [mostActiveSortedData, setMostActiveSortedData] = React.useState([]);
+  useEffect(() => {
+    setLosers24HRSortedData([...gainers24HRSortedData].reverse())
+  }, [gainers24HRSortedData])
+  useEffect(() => {
+    setTVLLosers24HRSortedData([...tvlGainers24HRSortedData].reverse())
+  }, [tvlGainers24HRSortedData])
 
   const displayUserName = () => {
     if (!isAuthenticated) return '...Please connect MetaMask with Authenticate Button';
@@ -122,9 +58,7 @@ export default function App() {
           id: point.attributes.transaction_index,
           ...point.attributes
         };
-        console.log(tempObj);
         temp.push(tempObj);
-        console.log(temp);
       });
       await setChainData(temp);
       console.log(temp);
@@ -134,31 +68,29 @@ export default function App() {
     }
   };
 
+  const sortGainers = (a, b, propToSortBy) => {
+    if (a[propToSortBy] > b[propToSortBy]) return -1;
+    if (a[propToSortBy] < b[propToSortBy]) return 1;
+    return 0;
+  }
+
+  //TODO convert to async-await
   const getPDEXData = () => {
     axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1')
-    .then(function (response) {
-      // handle success
-      console.log(response);
-      setGainersSortedData([...response.data.sort((a, b) => {
-        if (a.Price_PctChg_24hr > b.Price_PctChg_24hr) {
-          return -1;
-        }
-        if (a.Price_PctChg_24hr < b.Price_PctChg_24hr) {
-          return 1;
-        }
-        // a must be equal to b
-        return 0;
-      })])
-      setLosersSortedData([...response.data.sort((a, b) => {
-        if (a.Price_PctChg_24hr < b.Price_PctChg_24hr) {
-          return -1;
-        }
-        if (a.Price_PctChg_24hr > b.Price_PctChg_24hr) {
-          return 1;
-        }
-        // a must be equal to b
-        return 0;
-      })])
+    .then((response) => {
+
+      setGainers24HRSortedData([...response.data.sort((a, b) => {
+        return sortGainers(a, b, 'Price_PctChg_24hr');
+      })]);
+      setTVLGainers24HRSortedData([...response.data.sort((a, b) => {
+        return sortGainers(a, b, 'TVL_USD_24hr');
+      })]);
+      setGainers10MINSortedData([...response.data.sort((a, b) => {
+        return sortGainers(a, b, 'Price_PctChg_10min');
+      })]);
+      setMostActiveSortedData([...response.data.sort((a, b) => {
+        return sortGainers(a, b, 'Volume_USD_24hr');
+      })]);
       setPDexData(response.data);
     })
     .catch(function (error) {
@@ -171,130 +103,14 @@ export default function App() {
   }
   if (!pDexData.length) getPDEXData()
 
-  console.log(chainData);
-
-  const renderTable = () => {
-    if (!pDexData.length) return null;
-    let isApeMode = false;
-
-    if (!isApeMode) {
-      return (
-          <div className={classes.tableContainer}>
-
-            <h2 className={classes.tableHeader}>
-              <i className="fa fa-arrow-circle-up" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}></i>
-              Top Gainers (24hrs)
-            </h2>
-            <table className={classes.genTable}>
-              <tbody>
-              {
-                gainersSortedData.map((rToken, index) => {
-                  //TODO: need this method
-                  // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
-
-                  let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
-                  // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                  let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
-                  let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
-                  let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-                  let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
-                  console.log(rToken)
-                  return <tr>
-
-                    <td className={classes.tdPriceChg}>
-                      <div className={classes.dashPriceChg}>
-                        <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{priceChange}%</div>
-                      </div>
-                      <div className={classes.dashPrice}>{rToken.current_mstbePrice}</div>
-                    </td>
-                    <td className={classes.tdTokenData}>
-                      <div className={classes.tokenSymbol}>
-                        {rToken.mdtTokenSymbol}
-                      </div>
-                      <div className={classes.dashVol}>vol: {rToken.VolumeUSD_24hr}</div>
-                    </td>
-                    <td className={classes.tdTVL24}>
-                      <div className={classes.totValLocked}>
-                        {rToken.current_TVL_USD}
-                      </div>
-                      <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>{rToken.TVL_USD_24hr}</div>
-                    </td>
-                    <td className={classes.tdTVLTitle}>
-                      <div className={classes.tvl}>
-                        TVL
-                      </div>
-                    </td>
-
-                  </tr>
-                })
-              }
-              </tbody>
-            </table>
-          </div>
-      )
-    }
-  }
-
-  const renderLosersTable = () => {
-    if (!pDexData.length) return null;
-    let isApeMode = false;
-
-    if (!isApeMode) {
-      return (
-          <div className={classes.tableContainer}>
-
-            <h2 className={classes.tableHeader}>
-              <i className="fa fa-arrow-circle-down" style={{color:'red', margin:'4px 8px', fontSize: '20px'}}></i>
-              Top Gainers (24hrs)
-            </h2>
-            <table className={classes.genTable}>
-              <tbody>
-              {
-                losersSortedData.map((rToken, index) => {
-                  //TODO: need this method
-                  // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
-
-                  let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
-                  // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                  let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
-                  let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
-                  let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-                  let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
-                  console.log(rToken)
-                  return <tr>
-
-                    <td className={classes.tdPriceChg}>
-                      <div className={classes.dashPriceChg}>
-                        <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{priceChange}%</div>
-                      </div>
-                      <div className={classes.dashPrice}>{rToken.current_mstbePrice}</div>
-                    </td>
-                    <td className={classes.tdTokenData}>
-                      <div className={classes.tokenSymbol}>
-                        {rToken.mdtTokenSymbol}
-                      </div>
-                      <div className={classes.dashVol}>vol: {rToken.VolumeUSD_24hr}</div>
-                    </td>
-                    <td className={classes.tdTVL24}>
-                      <div className={classes.totValLocked}>
-                        {rToken.current_TVL_USD}
-                      </div>
-                      <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>{rToken.TVL_USD_24hr}</div>
-                    </td>
-                    <td className={classes.tdTVLTitle}>
-                      <div className={classes.tvl}>
-                        TVL
-                      </div>
-                    </td>
-
-                  </tr>
-                })
-              }
-              </tbody>
-            </table>
-          </div>
-      )
-    }
+  const renderGenericTable = (tableData, headerEnum) => {
+    if (!tableData.length) return;
+    return (
+      <Table
+          filteredTableData={tableData}
+          tableHeaderData={headerEnum}
+      />
+    )
   }
 
   const columns = [
@@ -342,9 +158,13 @@ export default function App() {
         />
       </div>
 
-      {/*{renderGraph()}*/}
-      {renderTable()}
-      {renderLosersTable()}
+      {renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR)}
+      {renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR)}
+      {renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN)}
+      {renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR)}
+      {renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR)}
+      {renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR)}
+
     </div>
   );
 }
