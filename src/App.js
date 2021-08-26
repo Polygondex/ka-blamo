@@ -187,7 +187,7 @@ export default function App() {
 
                   let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
                   // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                  let tokenSymbol = (rToken.mdtTokenSymbol == "MATIC" || rToken.mdtTokenSymbol == "WMATIC") ? "USDC" : "MATIC"
+                  let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
                   let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
                   let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
                   let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
@@ -249,7 +249,7 @@ export default function App() {
 
                   let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
                   // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                  let tokenSymbol = (rToken.mdtTokenSymbol == "MATIC" || rToken.mdtTokenSymbol == "WMATIC") ? "USDC" : "MATIC"
+                  let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
                   let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
                   let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
                   let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
@@ -332,8 +332,6 @@ export default function App() {
           className={classes.generalGridStyle}
           disableColumnFilter={true}
           disableColumnMenu={true}
-          // disableColumnSelector={true}
-          // disableColumnReorder={true}
         />
       </div>
 
