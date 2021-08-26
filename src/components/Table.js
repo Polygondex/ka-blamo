@@ -28,12 +28,14 @@ const useStyles = makeStyles({
     margin: '1px',
     background: '#000',
     borderRadius: '7px 7px 0 0',
-    fontSize: '18px',
+    fontSize: '20px',
     lineHeight: '27px',
     minWidth: '270px',
     position: 'sticky',
     top: '0',
     borderBottom: '1px dotted #656565',
+    display: 'flex',
+    alignItems: 'center'
   },
   tdPriceChg: {
     width: '22%',
@@ -101,7 +103,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
     if (tableHeaderData === TableHeaderEnum.GAINER_24HR){
       return (
         <h2 className={classes.tableHeader}>
-          <i className="fa fa-arrow-circle-up" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}/>
+          <i className="fa fa-arrow-circle-up" style={{color:'green', marginRight:'8px', fontSize: '22px'}}/>
           Top Gainers (24hrs)
         </h2>
       )
@@ -109,7 +111,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
     if (tableHeaderData === TableHeaderEnum.GAINER_10MIN){
       return (
         <h2 className={classes.tableHeader}>
-          <i className="fa fa-arrow-circle-up" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}/>
+          <i className="fa fa-arrow-circle-up" style={{color:'green', marginRight:'8px', fontSize: '22px'}}/>
           Top Gainers (10mins)
         </h2>
       )
@@ -117,7 +119,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
     if (tableHeaderData === TableHeaderEnum.LOSER_24HR){
       return (
         <h2 className={classes.tableHeader}>
-          <i className="fa fa-arrow-circle-down" style={{color:'red', margin:'4px 8px', fontSize: '20px'}}/>
+          <i className="fa fa-arrow-circle-down" style={{color:'red', marginRight:'8px', fontSize: '22px'}}/>
           Top Losers (24hrs)
         </h2>
       )
@@ -125,7 +127,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
     if (tableHeaderData === TableHeaderEnum.ACTIVE_24HR){
       return (
         <h2 className={classes.tableHeader}>
-          <i className="fa fa-chart-bar" style={{color:'white', margin:'4px 8px', fontSize: '20px'}}/>
+          <i className="fa fa-chart-bar" style={{color:'white', marginRight:'8px', fontSize: '22px'}}/>
           Most Active (24hrs)
         </h2>
       )
@@ -133,7 +135,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
     if (tableHeaderData === TableHeaderEnum.TVL_UP_24HR){
       return (
         <h2 className={classes.tableHeader}>
-          <i className="fas fa-piggy-bank" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}/>
+          <i className="fas fa-piggy-bank" style={{color:'green', marginRight:'8px', fontSize: '22px'}}/>
           $TVL - Most Deposited (24hrs)
         </h2>
       )
