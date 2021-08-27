@@ -37,22 +37,26 @@ const useStyles = makeStyles({
     alignItems: 'center'
   },
   tdPriceChg: {
-    width: '22%',
+    width: '20%',
     borderBottom: '1px dotted #656565',
-    padding: '5px 4px 5px 5px'
+    padding: '5px 8px 5px 5px',
+    textAlign: 'end'
   },
   dashPriceChg: {
     color: 'white',
+    marginBottom: '4px'
   },
   gainNum: {
     color: '#02C079',
     fontSize: '19px',
-    fontWeight: '600'
+    fontWeight: '600',
+    paddingBottom: '8px'
   },
   negNum: {
     color: 'red',
     fontSize: '19px',
-    fontWeight: '600'
+    fontWeight: '600',
+    paddingBottom: '8px'
   },
   gainNumTVL: {
     color: '#02C079',
@@ -81,7 +85,8 @@ const useStyles = makeStyles({
     display: 'flex',
     alignItems: 'center',
     fontWeight: '600',
-    fontSize: '19px'
+    fontSize: '19px',
+    paddingBottom: '8px'
   },
   tokenIcon: {
     height: '17px',
@@ -92,15 +97,20 @@ const useStyles = makeStyles({
     color: 'white',
     fontSize: '13px'
   },
+  volLabel: {
+    color: '#999797'
+  },
   tdTVL24: {
     borderBottom: '1px dotted #656565',
     padding: '5px 4px 5px 5px',
     color: 'white',
-    width: '20%',
+    width: '18%',
+    textAlign: 'end'
   },
   totValLocked: {
     color: 'white',
-    fontSize: '13px'
+    fontSize: '13px',
+    paddingBottom: '8px'
   },
   tvlChange: {
     color: 'white',
@@ -109,12 +119,16 @@ const useStyles = makeStyles({
   tdTVLTitle: {
     borderBottom: '1px dotted #656565',
     padding: '5px 4px 5px 5px',
-    width: '5%'
+    width: '5%',
   },
   tvl: {
     writingMode: 'vertical-rl',
     textOrientation: 'upright',
-    color: 'white'
+    color: '#727d73',
+    fontSize: '12px',
+    lineHeight: '12px',
+    fontWeight: '600',
+    textAlign: 'right',
   }
 });
 
@@ -199,18 +213,17 @@ const Table = ({filteredTableData, tableHeaderData}) => {
               let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
               let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
               let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
-              // console.log(rToken)
               return <tr>
 
                 <td className={classes.tdPriceChg}>
                   <div className={classes.dashPriceChg}>
                     <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
                   </div>
-                  <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(3)}</div>
+                  <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(4)}</div>
                 </td>
                 <td className={classes.tdTokenData}>
                   <div className={classes.tokenSymbol}>
-                    <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`} 
+                    <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
                     alt="None Found" className={classes.tokenIcon}
                     onError={(e)=>{
                       console.log(e)
@@ -219,7 +232,10 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                     />
                     {rToken.mdtTokenSymbol}
                   </div>
-                  <div className={classes.dashVol}>vol: ${kFormatter(rToken.VolumeUSD_24hr)}</div>
+                  <div className={classes.dashVol}>
+                    <span className={classes.volLabel}>vol: </span>
+                    ${kFormatter(rToken.VolumeUSD_24hr)}
+                  </div>
                 </td>
                 <td className={classes.tdTVL24}>
                   <div className={classes.totValLocked}>

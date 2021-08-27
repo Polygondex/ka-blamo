@@ -160,10 +160,10 @@ export default function App() {
 
       {renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR)}
       {renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR)}
+      {renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR)}
       {renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN)}
       {renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR)}
       {renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR)}
-      {renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR)}
 
     </div>
   );
