@@ -1,9 +1,7 @@
 import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import * as TableHeaderEnum from "../enums/TableHeaderEnum";
-import TrendingUpIcon from '@material-ui/icons/TrendingUp';
-import TrendingDownIcon from '@material-ui/icons/TrendingDown';
-import AssessmentIcon from '@material-ui/icons/Assessment';
+import { fontSize } from '@material-ui/system';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -21,7 +19,8 @@ const useStyles = makeStyles({
   },
   genTable: {
     width: '100%',
-    tableLayout: 'fixed'
+    tableLayout: 'fixed',
+    backgroundColor: '#1d1f22'
   },
   tableHeader: {
     padding: '7px',
@@ -43,41 +42,69 @@ const useStyles = makeStyles({
     padding: '5px 4px 5px 5px'
   },
   dashPriceChg: {
-    color: 'white'
+    color: 'white',
   },
   gainNum: {
-    color: '#02C079'
+    color: '#02C079',
+    fontSize: '19px',
+    fontWeight: '600'
   },
   negNum: {
-    color: 'red'
+    color: 'red',
+    fontSize: '19px',
+    fontWeight: '600'
+  },
+  gainNumTVL: {
+    color: '#02C079',
+    fontSize: '13px',
+    fontWeight: '600'
+  },
+  negNumTVL: {
+    color: 'red',
+    fontSize: '13px',
+    fontWeight: '600'
   },
   dashPrice: {
     whiteSpace: 'nowrap',
-    color: 'white'
+    color: 'white',
+    fontSize: '12px',
+    fontWeight: '400'
   },
   tdTokenData: {
     borderBottom: '1px dotted #656565',
     padding: '5px 4px 5px 5px',
     color: 'white',
-    width: '40%'
+    width: '50%'
   },
   tokenSymbol: {
-    color: '#97dfff'
+    color: '#97dfff',
+    display: 'flex',
+    alignItems: 'center',
+    fontWeight: '600',
+    fontSize: '19px'
+  },
+  tokenIcon: {
+    height: '17px',
+    width: '17px',
+    margin: '3px 6px 3px 3px'
   },
   dashVol: {
-    color: 'white'
+    color: 'white',
+    fontSize: '13px'
   },
   tdTVL24: {
     borderBottom: '1px dotted #656565',
     padding: '5px 4px 5px 5px',
     color: 'white',
-    width: '33%'
+    width: '20%',
   },
   totValLocked: {
-    color: 'white'
+    color: 'white',
+    fontSize: '13px'
   },
   tvlChange: {
-    color: 'white'
+    color: 'white',
+    fontSize: '13px'
   },
   tdTVLTitle: {
     borderBottom: '1px dotted #656565',
@@ -92,7 +119,12 @@ const useStyles = makeStyles({
 });
 
 const kFormatter = (num) => {
-  return Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k' : Math.sign(num)*Math.abs(num)
+  return Math.abs(num) > 999 ? Math.sign(num)*((Math.abs(num)/1000).toFixed(1)) + 'k' : num.toFixed(2);
+}
+
+const roundNumber = (value, precision) => {
+    let multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
 }
 
 const Table = ({filteredTableData, tableHeaderData}) => {
@@ -166,7 +198,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
               let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
               let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
               let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-              let priceChange = (rToken.Price_PctChg_24hr*100).toFixed(2);
+              let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
               // console.log(rToken)
               return <tr>
 
@@ -174,10 +206,17 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                   <div className={classes.dashPriceChg}>
                     <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
                   </div>
-                  <div className={classes.dashPrice}>${rToken.current_mstbePrice}</div>
+                  <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(3)}</div>
                 </td>
                 <td className={classes.tdTokenData}>
                   <div className={classes.tokenSymbol}>
+                    <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`} 
+                    alt="None Found" className={classes.tokenIcon}
+                    onError={(e)=>{
+                      console.log(e)
+                      e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                    }}
+                    />
                     {rToken.mdtTokenSymbol}
                   </div>
                   <div className={classes.dashVol}>vol: ${kFormatter(rToken.VolumeUSD_24hr)}</div>
@@ -186,7 +225,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                   <div className={classes.totValLocked}>
                     ${kFormatter(rToken.current_TVL_USD)}
                   </div>
-                  <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNum : classes.negNum}>${kFormatter(rToken.TVL_USD_24hr)}</div>
+                  <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
                 </td>
                 <td className={classes.tdTVLTitle}>
                   <div className={classes.tvl}>
