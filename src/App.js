@@ -36,6 +36,10 @@ export default function App() {
   const [tvlLosers24HRSortedData, setTVLLosers24HRSortedData] = React.useState([]);
   const [mostActiveSortedData, setMostActiveSortedData] = React.useState([]);
   useEffect(() => {
+    getPDEXData()
+      .catch(errResp => console.error(errResp))
+  }, [])
+  useEffect(() => {
     setLosers24HRSortedData([...gainers24HRSortedData].reverse())
   }, [gainers24HRSortedData])
   useEffect(() => {
@@ -75,33 +79,26 @@ export default function App() {
   }
 
   //TODO convert to async-await
-  const getPDEXData = () => {
-    axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1')
-    .then((response) => {
-
-      setGainers24HRSortedData([...response.data.sort((a, b) => {
+  const getPDEXData = async () => {
+    const pDexResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1');
+    if (pDexResp.data) {
+      const filterLowTvl = [...pDexResp.data.filter(token => token.current_TVL_USD >= 25000)]
+      setGainers24HRSortedData([...filterLowTvl.sort((a, b) => {
         return sortGainers(a, b, 'Price_PctChg_24hr');
       })]);
-      setTVLGainers24HRSortedData([...response.data.sort((a, b) => {
-        return sortGainers(a, b, 'TVL_USD_24hr');
-      })]);
-      setGainers10MINSortedData([...response.data.sort((a, b) => {
+      setGainers10MINSortedData([...filterLowTvl.sort((a, b) => {
         return sortGainers(a, b, 'Price_PctChg_10min');
       })]);
-      setMostActiveSortedData([...response.data.sort((a, b) => {
-        return sortGainers(a, b, 'Volume_USD_24hr');
+      setMostActiveSortedData([...filterLowTvl.sort((a, b) => {
+        return sortGainers(a, b, 'VolumeUSD_24hr');
       })]);
-      setPDexData(response.data);
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-    })
-    .then(function () {
-      // always executed
-    });
+      setTVLGainers24HRSortedData([...pDexResp.data.sort((a, b) => {
+        return sortGainers(a, b, 'TVL_USD_24hr');
+      })]);
+      // setPDexData(pDexResp.data);
+      // console.log(pDexResp.data)
+    }
   }
-  if (!pDexData.length) getPDEXData()
 
   const renderGenericTable = (tableData, headerEnum) => {
     if (!tableData.length) return;

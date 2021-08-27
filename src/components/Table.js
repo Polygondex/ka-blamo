@@ -1,7 +1,6 @@
 import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import * as TableHeaderEnum from "../enums/TableHeaderEnum";
-import { fontSize } from '@material-ui/system';
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -224,9 +223,8 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                 <td className={classes.tdTokenData}>
                   <div className={classes.tokenSymbol}>
                     <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
-                    alt="None Found" className={classes.tokenIcon}
+                    alt="" className={classes.tokenIcon}
                     onError={(e)=>{
-                      console.log(e)
                       e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
                     }}
                     />
