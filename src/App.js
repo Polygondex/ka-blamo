@@ -148,15 +148,15 @@ export default function App() {
       </Button>
 
       <h3 className={classes.welcomeMsg}>Welcome {displayUserName()}</h3>
-      <div style={{ margin: 'auto', height: 800, width: '96%', backgroundColor: '#131416', color: 'white' }}>
-        <XGrid
-          rows={chainData}
-          columns={columns}
-          className={classes.generalGridStyle}
-          disableColumnFilter={true}
-          disableColumnMenu={true}
-        />
-      </div>
+      {/*<div style={{ margin: 'auto', height: 800, width: '96%', backgroundColor: '#131416', color: 'white' }}>*/}
+      {/*  <XGrid*/}
+      {/*    rows={chainData}*/}
+      {/*    columns={columns}*/}
+      {/*    className={classes.generalGridStyle}*/}
+      {/*    disableColumnFilter={true}*/}
+      {/*    disableColumnMenu={true}*/}
+      {/*  />*/}
+      {/*</div>*/}
 
       {renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR)}
       {renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR)}
