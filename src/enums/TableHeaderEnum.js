@@ -4,7 +4,8 @@ const TableHeaderEnum = Object.freeze({
   LOSER_24HR: 'LOSER_24HR',
   ACTIVE_24HR: 'ACTIVE_24HR',
   TVL_UP_24HR: 'TVL_UP_24HR',
-  TVL_DOWN_24HR: 'TVL_DOWN_24HR'
+  TVL_DOWN_24HR: 'TVL_DOWN_24HR',
+  NEWEST_LISTING: 'NEWEST_LISTING'
 });
 
 module.exports = TableHeaderEnum

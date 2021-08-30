@@ -7,8 +7,6 @@ import { MoralisProvider } from 'react-moralis';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
-
-
 ReactDOM.render(
   <MoralisProvider
     appId="yXYoxCHXnLT54ylFTQUM48MmxJWCYnFIKdirLvJU"

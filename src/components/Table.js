@@ -193,6 +193,14 @@ const Table = ({filteredTableData, tableHeaderData}) => {
         </h2>
       )
     }
+    if (tableHeaderData === TableHeaderEnum.NEWEST_LISTING){
+      return (
+        <h2 className={classes.tableHeader}>
+          <i className="fas fa-calendar-plus" style={{color:'green', margin:'4px 8px', fontSize: '20px'}}/>
+          Newest Listing
+        </h2>
+      )
+    }
   }
 
   return (
@@ -212,7 +220,7 @@ const Table = ({filteredTableData, tableHeaderData}) => {
               let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
               let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
               let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
-              return <tr>
+              return <tr  key={index}>
 
                 <td className={classes.tdPriceChg}>
                   <div className={classes.dashPriceChg}>
@@ -223,10 +231,10 @@ const Table = ({filteredTableData, tableHeaderData}) => {
                 <td className={classes.tdTokenData}>
                   <div className={classes.tokenSymbol}>
                     <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
-                    alt="" className={classes.tokenIcon}
-                    onError={(e)=>{
-                      e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
-                    }}
+                      alt="" className={classes.tokenIcon}
+                      onError={(e)=>{
+                        e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                      }}
                     />
                     {rToken.mdtTokenSymbol}
                   </div>

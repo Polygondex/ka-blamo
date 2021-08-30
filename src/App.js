@@ -35,6 +35,7 @@ export default function App() {
   const [tvlGainers24HRSortedData, setTVLGainers24HRSortedData] = React.useState([]);
   const [tvlLosers24HRSortedData, setTVLLosers24HRSortedData] = React.useState([]);
   const [mostActiveSortedData, setMostActiveSortedData] = React.useState([]);
+  const [newestListingSortedData, setNewestListingSortedData] = React.useState([]);
   useEffect(() => {
     getPDEXData()
       .catch(errResp => console.error(errResp))
@@ -78,6 +79,15 @@ export default function App() {
     return 0;
   }
 
+  const sortByListingDate = (a, b) => {
+    let trimmedA = a?.DateListed.substring(6, a.DateListed.length - 3)
+    let trimmedB = b?.DateListed.substring(6, b.DateListed.length - 3)
+    console.log(trimmedA, trimmedB)
+    if (trimmedA > trimmedB) return -1;
+    if (trimmedA < trimmedB) return 1;
+    return 0;
+  }
+
   //TODO convert to async-await
   const getPDEXData = async () => {
     const pDexResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1');
@@ -95,8 +105,12 @@ export default function App() {
       setTVLGainers24HRSortedData([...pDexResp.data.sort((a, b) => {
         return sortGainers(a, b, 'TVL_USD_24hr');
       })]);
+      setNewestListingSortedData([...pDexResp.data.sort((a, b) => {
+        return sortByListingDate(a, b);
+      })]);
+      console.log(newestListingSortedData)
       // setPDexData(pDexResp.data);
-      // console.log(pDexResp.data)
+      console.log(pDexResp.data)
     }
   }
 
@@ -133,7 +147,7 @@ export default function App() {
 
   return (
     <div className={'primaryBackground'}>
-      <NavBar />
+      <NavBar tokenList={gainers24HRSortedData}/>
       <Button style={{ background: 'lightgreen', width: '150px', margin: '30px' }} onClick={() => authenticate()}>
         Authenticate
       </Button>
@@ -161,6 +175,7 @@ export default function App() {
       {renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN)}
       {renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR)}
       {renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR)}
+      {renderGenericTable(newestListingSortedData, TableHeaderEnum.NEWEST_LISTING)}
 
     </div>
   );

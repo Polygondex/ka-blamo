@@ -1,10 +1,9 @@
 import React from 'react';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { alpha, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
@@ -14,13 +13,22 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import pdexIcon from '../images/pDexIcon2.png';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@material-ui/core/TextField';
+import withStyles from "@material-ui/core/styles/withStyles";
+import CloseIcon from '@material-ui/icons/Close';
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Paper from "@material-ui/core/Paper";
+
 
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1
   },
-  menuButton: {
-    marginRight: theme.spacing(2)
+  titleWrapper: {
+    display: 'flex',
+    alignItems: 'center'
   },
   title: {
     display: 'none',
@@ -31,9 +39,9 @@ const useStyles = makeStyles((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25)
+      backgroundColor: alpha(theme.palette.common.white, 0.25)
     },
     marginRight: theme.spacing(2),
     marginLeft: 0,
@@ -52,19 +60,24 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  inputRoot: {
-    color: 'inherit'
+  autocompleteSearch: {
+    width: '32ch',
+    margin: '0 16px',
+
   },
-  inputInput: {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '20ch'
-    }
-  },
+  // inputRoot: {
+  //   color: 'inherit'
+  // },
+  // inputInput: {
+  //   padding: theme.spacing(1, 1, 1, 0),
+  //   // vertical padding + font size from searchIcon
+  //   paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+  //   transition: theme.transitions.create('width'),
+  //   width: '100%',
+  //   [theme.breakpoints.up('md')]: {
+  //     width: '20ch'
+  //   }
+  // },
   sectionDesktop: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
@@ -79,10 +92,77 @@ const useStyles = makeStyles((theme) => ({
   },
   navBar: {
     backgroundColor: '#1D1D1D'
-  }
+  },
+  dex: {
+    color: '#A874FF'
+  },
+  pdexIcon: {
+    maxHeight: '40px',
+    makeStyles: '100px',
+    marginRight: '8px'
+  },
+  tokenIcon: {
+    height: '16px',
+    width: '16px',
+    marginRight: '8px',
+    border: 'none'
+  },
+  autocompleteOption: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    minWidth: '0',
+    flexDirection: 'row'
+  },
+
 }));
 
-const NavBar = () => {
+const CssTextField = withStyles({
+  root: {
+    '& label.Mui-focused': {
+      color: 'green',
+    },
+    '& .MuiInput-underline:after': {
+      borderBottomColor: 'green',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: 'darkGreen',
+      },
+      '&:hover fieldset': {
+        borderColor: 'green',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: 'green',
+      },
+    },
+    color: 'white',
+  },
+})(TextField);
+
+const NavBar = ({tokenList}) => {
+  const defaultProps = {
+    options: tokenList,
+    getOptionLabel: (option) => `${option.mdtTokenName} - ${option.mdtTokenSymbol}`,
+    renderOption: (option) => (
+      <React.Fragment>
+        <div className={classes.autocompleteOption}>
+
+          <img
+              src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${option.mdtTokenAddr}.png`}
+              alt="" className={classes.tokenIcon}
+              onError={(e)=>{
+                e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+              }}
+          />
+          {option.mdtTokenSymbol} - {option.mdtTokenName}
+        </div>
+      </React.Fragment>
+    )
+  };
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -171,19 +251,43 @@ const NavBar = () => {
           <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer">
             <MenuIcon />
           </IconButton>
-          <Typography className={classes.title} variant="h6" noWrap>
-            POLYGONDEX
-          </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{ root: classes.inputRoot, input: classes.inputInput }}
-              inputProps={{ 'aria-label': 'search' }}
-            />
+          <div className={classes.titleWrapper}>
+            <img className={classes.pdexIcon} src={pdexIcon} alt='PDexLogo'/>
+            <Typography className={classes.title} variant="h5" noWrap>
+              Polygon
+              <span className={classes.dex}>DEX</span>
+            </Typography>
           </div>
+          <Autocomplete
+              {...defaultProps}
+              id="auto-complete"
+              size={'small'}
+              freeSolo
+              PaperComponent={({children}) => (
+                  <Paper style={{ background: "lightgrey" }}>{children}</Paper>
+              )}
+              closeIcon={<CloseIcon fontSize="small" style={{ color: 'red', marginLeft: 'auto' }} />}
+              renderInput={(params) => (
+                  <CssTextField
+                      className={classes.autocompleteSearch}
+                      {...params}
+                      label="Crypto Quote"
+                      margin="normal"
+                      variant="outlined"
+                      InputProps={{ ...params.InputProps, style: {color:'white'}, startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                      InputLabelProps={{
+                        style: {
+                          color: 'white'
+                        }
+                      }}
+                  />
+              )}
+          />
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
             <IconButton aria-label="show 4 new mails" color="inherit">
