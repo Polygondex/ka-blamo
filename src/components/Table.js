@@ -239,7 +239,7 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
 
     const hoursDifference = Math.floor(difference/1000/60/60);
 
-    if (hoursDifference > 24) return (<span className={classes.listedTime}><span className={classes.listedTimeLabel}>LISTED: </span>{daysDifference} days ago</span>)
+    if (daysDifference) return (<span className={classes.listedTime}><span className={classes.listedTimeLabel}>LISTED: </span>{daysDifference} days ago</span>)
     return (<span className={classes.listedTimeHrs}><span className={classes.listedTimeLabel}>LISTED: </span>{hoursDifference} hrs ago</span>)
   }
 
