@@ -28,24 +28,31 @@ export default function App() {
   const classes = useStyles();
   const [chainData, setChainData] = React.useState([]);
   const { authenticate, isAuthenticated, user, Moralis, logout, isInitialized } = useMoralis();
-  const [pDexData, setPDexData] = React.useState([]);
+  const [apeMode, setApeMode] = React.useState(false);
   const [gainers24HRSortedData, setGainers24HRSortedData] = React.useState([]);
   const [gainers10MINSortedData, setGainers10MINSortedData] = React.useState([]);
   const [losers24HRSortedData, setLosers24HRSortedData] = React.useState([]);
   const [tvlGainers24HRSortedData, setTVLGainers24HRSortedData] = React.useState([]);
   const [tvlLosers24HRSortedData, setTVLLosers24HRSortedData] = React.useState([]);
   const [mostActiveSortedData, setMostActiveSortedData] = React.useState([]);
-  const [newestListingSortedData, setNewestListingSortedData] = React.useState([]);
+
+  const [mostActiveApeModeSortedData, setMostActiveApeModeSortedData] = React.useState([]);
+  const [newestListingApeModeSortedData, setNewestListingApeModeSortedData] = React.useState([]);
+  const [gainers24HRApeModeSortedData, setGainers24HRApeModeSortedData] = React.useState([]);
   useEffect(() => {
     getPDEXData()
       .catch(errResp => console.error(errResp))
-  }, [])
+  }, []);
   useEffect(() => {
     setLosers24HRSortedData([...gainers24HRSortedData].reverse())
-  }, [gainers24HRSortedData])
+  }, [gainers24HRSortedData]);
   useEffect(() => {
     setTVLLosers24HRSortedData([...tvlGainers24HRSortedData].reverse())
-  }, [tvlGainers24HRSortedData])
+  }, [tvlGainers24HRSortedData]);
+  useEffect(() => {
+    if (apeMode) getApeModeData().catch(errResp => console.error(errResp));
+  }, [apeMode]);
+
 
   const displayUserName = () => {
     if (!isAuthenticated) return '...Please connect MetaMask with Authenticate Button';
@@ -82,13 +89,11 @@ export default function App() {
   const sortByListingDate = (a, b) => {
     let trimmedA = a?.DateListed.substring(6, a.DateListed.length - 3)
     let trimmedB = b?.DateListed.substring(6, b.DateListed.length - 3)
-    console.log(trimmedA, trimmedB)
     if (trimmedA > trimmedB) return -1;
     if (trimmedA < trimmedB) return 1;
     return 0;
   }
 
-  //TODO convert to async-await
   const getPDEXData = async () => {
     const pDexResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1');
     if (pDexResp.data) {
@@ -105,12 +110,28 @@ export default function App() {
       setTVLGainers24HRSortedData([...pDexResp.data.sort((a, b) => {
         return sortGainers(a, b, 'TVL_USD_24hr');
       })]);
-      setNewestListingSortedData([...pDexResp.data.sort((a, b) => {
-        return sortByListingDate(a, b);
-      })]);
-      console.log(newestListingSortedData)
       // setPDexData(pDexResp.data);
       console.log(pDexResp.data)
+    }
+  }
+
+  const getApeModeData = async () => {
+    // TODO Will need to change for updating
+    if (gainers24HRApeModeSortedData.length && mostActiveApeModeSortedData.length && newestListingApeModeSortedData.length) return;
+    const apeModeData = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=ape');
+    if (apeModeData.data) {
+      // const filterLowTvl = [...apeModeData.data.filter(token => token.current_TVL_USD >= 25000)]
+      setGainers24HRApeModeSortedData([...apeModeData.data.sort((a, b) => {
+        return sortGainers(a, b, 'Price_PctChg_24hr');
+      })]);
+      setMostActiveApeModeSortedData([...apeModeData.data.sort((a, b) => {
+        return sortGainers(a, b, 'VolumeUSD_24hr');
+      })]);
+      setNewestListingApeModeSortedData([...apeModeData.data.sort((a, b) => {
+        return sortByListingDate(a, b);
+      })]);
+      // setPDexData(apeModeData.data);
+      console.log(apeModeData.data)
     }
   }
 
@@ -120,9 +141,25 @@ export default function App() {
       <Table
           filteredTableData={tableData}
           tableHeaderData={headerEnum}
+          apeMode={apeMode}
       />
     )
   }
+
+  const apeModeCharts = [
+    renderGenericTable(gainers24HRApeModeSortedData, TableHeaderEnum.GAINER_24HR),
+    renderGenericTable(newestListingApeModeSortedData, TableHeaderEnum.NEWEST_LISTING),
+    renderGenericTable(mostActiveApeModeSortedData, TableHeaderEnum.ACTIVE_24HR)
+  ];
+  const regularCharts = [
+    renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR),
+    renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR),
+    renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR),
+    renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN),
+    renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR),
+    renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR),
+  ];
+
 
   const columns = [
     { title: 'block_hash', field: 'block_hash' },
@@ -147,7 +184,7 @@ export default function App() {
 
   return (
     <div className={'primaryBackground'}>
-      <NavBar tokenList={gainers24HRSortedData}/>
+      <NavBar tokenList={gainers24HRSortedData} setApeMode={setApeMode} apeMode={apeMode}/>
       <Button style={{ background: 'lightgreen', width: '150px', margin: '30px' }} onClick={() => authenticate()}>
         Authenticate
       </Button>
@@ -169,13 +206,7 @@ export default function App() {
       {/*  />*/}
       {/*</div>*/}
 
-      {renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR)}
-      {renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR)}
-      {renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR)}
-      {renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN)}
-      {renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR)}
-      {renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR)}
-      {renderGenericTable(newestListingSortedData, TableHeaderEnum.NEWEST_LISTING)}
+      {!apeMode ? regularCharts : apeModeCharts}
 
     </div>
   );

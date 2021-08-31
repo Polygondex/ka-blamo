@@ -140,7 +140,7 @@ const roundNumber = (value, precision) => {
     return Math.round(value * multiplier) / multiplier;
 }
 
-const Table = ({filteredTableData, tableHeaderData}) => {
+const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
   const classes = useStyles();
   const [tableData] = React.useState(filteredTableData);
 

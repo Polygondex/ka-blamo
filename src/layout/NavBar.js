@@ -113,10 +113,12 @@ const useStyles = makeStyles((theme) => ({
   },
   apeModeIcon: {
     maxHeight: '26px',
+    marginTop: '-3px'
   },
   apeModeOffIcon: {
     maxHeight: '26px',
-    opacity: '0.4'
+    opacity: '0.4',
+    marginTop: '-3px'
   },
   apeModeFormGroup: {
 
@@ -160,7 +162,7 @@ const PurpleSwitch = withStyles({
   track: {},
 })(Switch);
 
-const NavBar = ({tokenList, apeMode}) => {
+const NavBar = ({tokenList, apeMode, setApeMode}) => {
   const defaultProps = {
     options: tokenList,
     getOptionLabel: (option) => `${option.mdtTokenName} - ${option.mdtTokenSymbol}`,
@@ -209,6 +211,7 @@ const NavBar = ({tokenList, apeMode}) => {
   };
 
   const handleApeModeChange = (event) => {
+    setApeMode(event.target.checked);
     setApeModeActivated(event.target.checked);
   }
 
@@ -286,7 +289,7 @@ const NavBar = ({tokenList, apeMode}) => {
             <div className={classes.grow} />
             <FormGroup aria-label="position" row className={classes.apeModeFormGroup}>
               <FormControlLabel
-                  control={<PurpleSwitch checked={apeModeActivated} onChange={handleApeModeChange} name="checkedA"
+                  control={<PurpleSwitch checked={apeModeActivated} onChange={handleApeModeChange} name="apeMode"
                             icon={<img className={classes.apeModeOffIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
                             checkedIcon={<img className={classes.apeModeIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
                   />}
