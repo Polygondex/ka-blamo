@@ -13,13 +13,13 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
-import pdexIcon from '../images/pDexIcon2.png';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import withStyles from "@material-ui/core/styles/withStyles";
 import CloseIcon from '@material-ui/icons/Close';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Paper from "@material-ui/core/Paper";
+import pdexIcon from '../images/pDexIcon2.png';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -65,19 +65,6 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 16px',
 
   },
-  // inputRoot: {
-  //   color: 'inherit'
-  // },
-  // inputInput: {
-  //   padding: theme.spacing(1, 1, 1, 0),
-  //   // vertical padding + font size from searchIcon
-  //   paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-  //   transition: theme.transitions.create('width'),
-  //   width: '100%',
-  //   [theme.breakpoints.up('md')]: {
-  //     width: '20ch'
-  //   }
-  // },
   sectionDesktop: {
     display: 'none',
     [theme.breakpoints.up('md')]: {
@@ -111,11 +98,14 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     display: 'flex',
     alignItems: 'center',
+    minWidth: '0',
+    flexDirection: 'row'
+  },
+  autocompleteOptionWrapper: {
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     minWidth: '0',
-    flexDirection: 'row'
   },
 
 }));
@@ -148,19 +138,22 @@ const NavBar = ({tokenList}) => {
     options: tokenList,
     getOptionLabel: (option) => `${option.mdtTokenName} - ${option.mdtTokenSymbol}`,
     renderOption: (option) => (
-      <React.Fragment>
-        <div className={classes.autocompleteOption}>
+        <React.Fragment>
+          <div className={classes.autocompleteOption}>
 
-          <img
-              src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${option.mdtTokenAddr}.png`}
-              alt="" className={classes.tokenIcon}
-              onError={(e)=>{
-                e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
-              }}
-          />
-          {option.mdtTokenSymbol} - {option.mdtTokenName}
-        </div>
-      </React.Fragment>
+            <img
+                src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${option.mdtTokenAddr}.png`}
+                alt="" className={classes.tokenIcon}
+                onError={(e)=>{
+                  e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                }}
+            />
+            <span className={classes.autocompleteOptionWrapper}>
+            {option.mdtTokenSymbol} - {option.mdtTokenName}
+          </span>
+          </div>
+
+        </React.Fragment>
     )
   };
   const classes = useStyles();
@@ -189,144 +182,145 @@ const NavBar = ({tokenList}) => {
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
+      <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          id={menuId}
+          keepMounted
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={isMenuOpen}
+          onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+        <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      </Menu>
   );
 
   const mobileMenuId = 'primary-search-account-menu-mobile';
   const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton aria-label="show 11 new notifications" color="inherit">
-          <Badge badgeContent={11} color="secondary">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
+      <Menu
+          anchorEl={mobileMoreAnchorEl}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          id={mobileMenuId}
+          keepMounted
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={isMobileMenuOpen}
+          onClose={handleMobileMenuClose}
+      >
+        <MenuItem>
+          <IconButton aria-label="show 4 new mails" color="inherit">
+            <Badge badgeContent={4} color="secondary">
+              <MailIcon />
+            </Badge>
+          </IconButton>
+          <p>Messages</p>
+        </MenuItem>
+        <MenuItem>
+          <IconButton aria-label="show 11 new notifications" color="inherit">
+            <Badge badgeContent={11} color="secondary">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+          <p>Notifications</p>
+        </MenuItem>
+        <MenuItem onClick={handleProfileMenuOpen}>
+          <IconButton
+              aria-label="account of current user"
+              aria-controls="primary-search-account-menu"
+              aria-haspopup="true"
+              color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
+          <p>Profile</p>
+        </MenuItem>
+      </Menu>
   );
 
   return (
-    <div className={classes.grow}>
-      <AppBar position="static" className={classes.navBar}>
-        <Toolbar>
-          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer">
-            <MenuIcon />
-          </IconButton>
-          <div className={classes.titleWrapper}>
-            <img className={classes.pdexIcon} src={pdexIcon} alt='PDexLogo'/>
-            <Typography className={classes.title} variant="h5" noWrap>
-              Polygon
-              <span className={classes.dex}>DEX</span>
-            </Typography>
-          </div>
-          <Autocomplete
-              {...defaultProps}
-              id="auto-complete"
-              size={'small'}
-              freeSolo
-              PaperComponent={({children}) => (
-                  <Paper style={{ background: "lightgrey" }}>{children}</Paper>
-              )}
-              closeIcon={<CloseIcon fontSize="small" style={{ color: 'red', marginLeft: 'auto' }} />}
-              renderInput={(params) => (
-                  <CssTextField
-                      className={classes.autocompleteSearch}
-                      {...params}
-                      label="Crypto Quote"
-                      margin="normal"
-                      variant="outlined"
-                      InputProps={{ ...params.InputProps, style: {color:'white'}, startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        )
-                      }}
-                      InputLabelProps={{
-                        style: {
-                          color: 'white'
-                        }
-                      }}
-                  />
-              )}
-          />
-          <div className={classes.grow} />
-          <div className={classes.sectionDesktop}>
-            <IconButton aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <MailIcon />
-              </Badge>
+      <div className={classes.grow}>
+        <AppBar position="static" className={classes.navBar}>
+          <Toolbar>
+            <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="open drawer">
+              <MenuIcon />
             </IconButton>
-            <IconButton aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </div>
-          <div className={classes.sectionMobile}>
-            <IconButton
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </div>
-        </Toolbar>
-      </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
-    </div>
+            <div className={classes.titleWrapper}>
+              <img className={classes.pdexIcon} src={pdexIcon} alt='PDexLogo'/>
+              <Typography className={classes.title} variant="h5" noWrap>
+                Polygon
+                <span className={classes.dex}>DEX</span>
+              </Typography>
+            </div>
+            <div className={classes.grow} />
+
+            <Autocomplete
+                {...defaultProps}
+                id="auto-complete"
+                size={'small'}
+                freeSolo
+                PaperComponent={({children}) => (
+                    <Paper style={{ background: "lightgrey" }}>{children}</Paper>
+                )}
+                closeIcon={<CloseIcon fontSize="small" style={{ color: 'red', marginLeft: 'auto' }} />}
+                renderInput={(params) => (
+                    <CssTextField
+                        className={classes.autocompleteSearch}
+                        {...params}
+                        label="Crypto Quote"
+                        margin="normal"
+                        variant="outlined"
+                        InputProps={{ ...params.InputProps, style: {color:'white'}, startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                          )
+                        }}
+                        InputLabelProps={{
+                          style: {
+                            color: 'white'
+                          }
+                        }}
+                    />
+                )}
+            />
+            {/*<div className={classes.sectionDesktop}>*/}
+            {/*  <IconButton aria-label="show 4 new mails" color="inherit">*/}
+            {/*    <Badge badgeContent={4} color="secondary">*/}
+            {/*      <MailIcon />*/}
+            {/*    </Badge>*/}
+            {/*  </IconButton>*/}
+            {/*  <IconButton aria-label="show 17 new notifications" color="inherit">*/}
+            {/*    <Badge badgeContent={17} color="secondary">*/}
+            {/*      <NotificationsIcon />*/}
+            {/*    </Badge>*/}
+            {/*  </IconButton>*/}
+            {/*  <IconButton*/}
+            {/*      edge="end"*/}
+            {/*      aria-label="account of current user"*/}
+            {/*      aria-controls={menuId}*/}
+            {/*      aria-haspopup="true"*/}
+            {/*      onClick={handleProfileMenuOpen}*/}
+            {/*      color="inherit"*/}
+            {/*  >*/}
+            {/*    <AccountCircle />*/}
+            {/*  </IconButton>*/}
+            {/*</div>*/}
+            {/*<div className={classes.sectionMobile}>*/}
+            {/*  <IconButton*/}
+            {/*      aria-label="show more"*/}
+            {/*      aria-controls={mobileMenuId}*/}
+            {/*      aria-haspopup="true"*/}
+            {/*      onClick={handleMobileMenuOpen}*/}
+            {/*      color="inherit"*/}
+            {/*  >*/}
+            {/*    <MoreIcon />*/}
+            {/*  </IconButton>*/}
+            {/*</div>*/}
+          </Toolbar>
+        </AppBar>
+        {renderMobileMenu}
+        {renderMenu}
+      </div>
   );
 }
 
