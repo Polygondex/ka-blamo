@@ -1,6 +1,7 @@
 import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import * as TableHeaderEnum from "../enums/TableHeaderEnum";
+import moment from "moment";
 
 const useStyles = makeStyles({
   tableContainer: {
@@ -13,6 +14,19 @@ const useStyles = makeStyles({
     width: '30%',
     display: 'inline-block',
     height: '600px',
+    position: 'relative',
+    overflow: 'scroll',
+  },
+  tableContainerApeMode: {
+    border: '1px solid #a59393',
+    background: 'black',
+    borderRadius: '10px',
+    margin: '12px',
+    padding: '0 5px 5px',
+    boxShadow: '3px 3px 3px #000',
+    width: '30%',
+    display: 'inline-block',
+    height: '800px',
     position: 'relative',
     overflow: 'scroll',
   },
@@ -128,6 +142,17 @@ const useStyles = makeStyles({
     lineHeight: '12px',
     fontWeight: '600',
     textAlign: 'right',
+  },
+  listedTimeLabel:{
+    color: '#999797',
+    fontSize: '13px'
+  },
+  listedTime: {
+    fontSize: '13px'
+  },
+  listedTimeHrs: {
+    color: 'yellow',
+    fontSize: '13px'
   }
 });
 
@@ -139,6 +164,7 @@ const roundNumber = (value, precision) => {
     let multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
 }
+
 
 const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
   const classes = useStyles();
@@ -203,64 +229,144 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
     }
   }
 
-  return (
-      <div className={classes.tableContainer}>
+  const formatListingTime = (date) => {
+    const currentUnixTimestamp = (new Date().getTime());
+    const cleanedTimestamp = parseInt(date.substring(6, date.length - 2));
+    let difference = currentUnixTimestamp - cleanedTimestamp;
 
-        {renderTableTitleIcon()}
-        <table className={classes.genTable}>
-          <tbody>
-          {
-            tableData.map((rToken, index) => {
-              //TODO: need this method
-              // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+    const daysDifference = Math.floor(difference/1000/60/60/24);
+    difference -= daysDifference*1000*60*60*24
 
-              let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
-              // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-              let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
-              let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
-              let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-              let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
-              return <tr  key={index}>
+    const hoursDifference = Math.floor(difference/1000/60/60);
 
-                <td className={classes.tdPriceChg}>
-                  <div className={classes.dashPriceChg}>
-                    <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
-                  </div>
-                  <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(4)}</div>
-                </td>
-                <td className={classes.tdTokenData}>
-                  <div className={classes.tokenSymbol}>
-                    <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
-                      alt="" className={classes.tokenIcon}
-                      onError={(e)=>{
-                        e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
-                      }}
-                    />
-                    {rToken.mdtTokenSymbol}
-                  </div>
-                  <div className={classes.dashVol}>
-                    <span className={classes.volLabel}>vol: </span>
-                    ${kFormatter(rToken.VolumeUSD_24hr)}
-                  </div>
-                </td>
-                <td className={classes.tdTVL24}>
-                  <div className={classes.totValLocked}>
-                    ${kFormatter(rToken.current_TVL_USD)}
-                  </div>
-                  <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
-                </td>
-                <td className={classes.tdTVLTitle}>
-                  <div className={classes.tvl}>
-                    TVL
-                  </div>
-                </td>
+    if (hoursDifference > 24) return (<span className={classes.listedTime}><span className={classes.listedTimeLabel}>LISTED: </span>{daysDifference} days ago</span>)
+    return (<span className={classes.listedTimeHrs}><span className={classes.listedTimeLabel}>LISTED: </span>{hoursDifference} hrs ago</span>)
+  }
 
-              </tr>
-            })
-          }
-          </tbody>
-        </table>
-      </div>
-  );
+  if (!apeMode) {
+    return (
+        <div className={classes.tableContainerApeMode}>
+
+          {renderTableTitleIcon()}
+          <table className={classes.genTable}>
+            <tbody>
+            {
+              tableData.map((rToken, index) => {
+                //TODO: need this method
+                // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+
+                let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
+                // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
+                let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
+                let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
+                let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
+                let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
+                return <tr  key={index}>
+
+                  <td className={classes.tdPriceChg}>
+                    <div className={classes.dashPriceChg}>
+                      <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
+                    </div>
+                    <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(4)}</div>
+                  </td>
+                  <td className={classes.tdTokenData}>
+                    <div className={classes.tokenSymbol}>
+                      <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
+                        alt="" className={classes.tokenIcon}
+                        onError={(e)=>{
+                          e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                        }}
+                      />
+                      {rToken.mdtTokenSymbol}
+                    </div>
+                    <div className={classes.dashVol}>
+                      <span className={classes.volLabel}>vol: </span>
+                      ${kFormatter(rToken.VolumeUSD_24hr)}
+                    </div>
+                  </td>
+                  <td className={classes.tdTVL24}>
+                    <div className={classes.totValLocked}>
+                      ${kFormatter(rToken.current_TVL_USD)}
+                    </div>
+                    <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
+                  </td>
+                  <td className={classes.tdTVLTitle}>
+                    <div className={classes.tvl}>
+                      TVL
+                    </div>
+                  </td>
+
+                </tr>
+              })
+            }
+            </tbody>
+          </table>
+        </div>
+    );
+  }
+  if (apeMode) {
+    return (
+        <div className={classes.tableContainer}>
+
+          {renderTableTitleIcon()}
+          <table className={classes.genTable}>
+            <tbody>
+            {
+              tableData.map((rToken, index) => {
+                //TODO: need this method
+                // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+
+                let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
+                // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
+                let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
+                let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
+                let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
+                let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
+                return <tr  key={index}>
+
+                  <td className={classes.tdPriceChg}>
+                    <div className={classes.dashPriceChg}>
+                      <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
+                    </div>
+                    <div className={classes.dashPrice}>${rToken.current_mstbePrice}</div>
+                  </td>
+                  <td className={classes.tdTokenData}>
+                    <div className={classes.tokenSymbol}>
+                      <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
+                        alt="" className={classes.tokenIcon}
+                        onError={(e)=>{
+                          e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                        }}
+                      />
+                      {rToken.mdtTokenSymbol}
+                    </div>
+                    <div className={classes.dashVol}>
+                      <span className={classes.volLabel}>vol: </span>
+                      ${kFormatter(rToken.VolumeUSD_24hr)}
+                    </div>
+                    <div className={classes.dashListed}>
+                      {formatListingTime(rToken.DateListed)}
+                    </div>
+                  </td>
+                  <td className={classes.tdTVL24}>
+                    <div className={classes.totValLocked}>
+                      ${kFormatter(rToken.current_TVL_USD)}
+                    </div>
+                    <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
+                  </td>
+                  <td className={classes.tdTVLTitle}>
+                    <div className={classes.tvl}>
+                      TVL
+                    </div>
+                  </td>
+
+                </tr>
+              })
+            }
+            </tbody>
+          </table>
+        </div>
+    );
+  }
 }
 export default Table;

@@ -87,8 +87,8 @@ export default function App() {
   }
 
   const sortByListingDate = (a, b) => {
-    let trimmedA = a?.DateListed.substring(6, a.DateListed.length - 3)
-    let trimmedB = b?.DateListed.substring(6, b.DateListed.length - 3)
+    let trimmedA = a?.DateListed.substring(6, a.DateListed.length - 2);
+    let trimmedB = b?.DateListed.substring(6, b.DateListed.length - 2);
     if (trimmedA > trimmedB) return -1;
     if (trimmedA < trimmedB) return 1;
     return 0;
