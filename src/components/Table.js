@@ -26,7 +26,7 @@ const useStyles = makeStyles({
     boxShadow: '3px 3px 3px #000',
     width: '30%',
     display: 'inline-block',
-    height: '800px',
+    height: '900px',
     position: 'relative',
     overflow: 'scroll',
   },
@@ -245,7 +245,7 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
 
   if (!apeMode) {
     return (
-        <div className={classes.tableContainerApeMode}>
+        <div className={classes.tableContainer}>
 
           {renderTableTitleIcon()}
           <table className={classes.genTable}>
@@ -306,7 +306,7 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
   }
   if (apeMode) {
     return (
-        <div className={classes.tableContainer}>
+        <div className={classes.tableContainerApeMode}>
 
           {renderTableTitleIcon()}
           <table className={classes.genTable}>
