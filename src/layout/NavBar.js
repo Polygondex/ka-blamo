@@ -20,6 +20,11 @@ import CloseIcon from '@material-ui/icons/Close';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import Paper from "@material-ui/core/Paper";
 import pdexIcon from '../images/pDexIcon2.png';
+import apeModeIcon from '../images/apeModeIcon.svg';
+import monkeyIcon from '../images/monkey.svg';
+import Switch from "@material-ui/core/Switch";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -85,7 +90,6 @@ const useStyles = makeStyles((theme) => ({
   },
   pdexIcon: {
     maxHeight: '40px',
-    makeStyles: '100px',
     marginRight: '8px'
   },
   tokenIcon: {
@@ -107,7 +111,16 @@ const useStyles = makeStyles((theme) => ({
     textOverflow: 'ellipsis',
     minWidth: '0',
   },
+  apeModeIcon: {
+    maxHeight: '26px',
+  },
+  apeModeOffIcon: {
+    maxHeight: '26px',
+    opacity: '0.4'
+  },
+  apeModeFormGroup: {
 
+  }
 }));
 
 const CssTextField = withStyles({
@@ -133,7 +146,21 @@ const CssTextField = withStyles({
   },
 })(TextField);
 
-const NavBar = ({tokenList}) => {
+const PurpleSwitch = withStyles({
+  switchBase: {
+    color: '#A874FF',
+    '&$checked': {
+      color: '#A874FF',
+    },
+    '&$checked + $track': {
+      backgroundColor: '#A874FF',
+    },
+  },
+  checked: {},
+  track: {},
+})(Switch);
+
+const NavBar = ({tokenList, apeMode}) => {
   const defaultProps = {
     options: tokenList,
     getOptionLabel: (option) => `${option.mdtTokenName} - ${option.mdtTokenSymbol}`,
@@ -159,6 +186,7 @@ const NavBar = ({tokenList}) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [apeModeActivated, setApeModeActivated] = React.useState(apeMode || false);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
@@ -179,6 +207,10 @@ const NavBar = ({tokenList}) => {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+
+  const handleApeModeChange = (event) => {
+    setApeModeActivated(event.target.checked);
+  }
 
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
@@ -252,6 +284,17 @@ const NavBar = ({tokenList}) => {
               </Typography>
             </div>
             <div className={classes.grow} />
+            <FormGroup aria-label="position" row className={classes.apeModeFormGroup}>
+              <FormControlLabel
+                  control={<PurpleSwitch checked={apeModeActivated} onChange={handleApeModeChange} name="checkedA"
+                            icon={<img className={classes.apeModeOffIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
+                            checkedIcon={<img className={classes.apeModeIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
+                  />}
+                  label="Custom color"
+                  label="Ape Mode"
+                  labelPlacement="top"
+              />
+            </FormGroup>
 
             <Autocomplete
                 {...defaultProps}
