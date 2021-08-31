@@ -68,7 +68,6 @@ const useStyles = makeStyles((theme) => ({
   autocompleteSearch: {
     width: '32ch',
     margin: '0 16px',
-
   },
   sectionDesktop: {
     display: 'none',
@@ -83,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   navBar: {
-    backgroundColor: '#1D1D1D'
+    backgroundColor: '#000000'
   },
   dex: {
     color: '#A874FF'
@@ -117,11 +116,16 @@ const useStyles = makeStyles((theme) => ({
   },
   apeModeOffIcon: {
     maxHeight: '26px',
-    opacity: '0.4',
+    filter: 'brightness(0.5)',
     marginTop: '-3px'
   },
-  apeModeFormGroup: {
-
+  switchBaseColor: {
+    backgroundColor: '#bd9ef2'
+  },
+  switchLabel: {
+    fontSize: '0.85rem !important',
+    fontWeight: '600 !important',
+    lineHeight: '1 !important'
   }
 }));
 
@@ -156,7 +160,7 @@ const PurpleSwitch = withStyles({
     },
     '&$checked + $track': {
       backgroundColor: '#A874FF',
-    },
+    }
   },
   checked: {},
   track: {},
@@ -289,12 +293,11 @@ const NavBar = ({tokenList, apeMode, setApeMode}) => {
             <div className={classes.grow} />
             <FormGroup aria-label="position" row className={classes.apeModeFormGroup}>
               <FormControlLabel
-                  control={<PurpleSwitch checked={apeModeActivated} onChange={handleApeModeChange} name="apeMode"
+                  control={<PurpleSwitch checked={apeModeActivated} onChange={handleApeModeChange} name="apeMode" classes={{track:classes.switchBaseColor}}
                             icon={<img className={classes.apeModeOffIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
                             checkedIcon={<img className={classes.apeModeIcon} src={apeModeIcon} alt='ApeMode Icon'/>}
                   />}
-                  label="Custom color"
-                  label="Ape Mode"
+                  label={<Typography className={classes.switchLabel}>Ape Mode</Typography>}
                   labelPlacement="top"
               />
             </FormGroup>

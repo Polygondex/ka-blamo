@@ -43,12 +43,15 @@ export default function App() {
     getPDEXData()
       .catch(errResp => console.error(errResp))
   }, []);
+
   useEffect(() => {
     setLosers24HRSortedData([...gainers24HRSortedData].reverse())
   }, [gainers24HRSortedData]);
+
   useEffect(() => {
     setTVLLosers24HRSortedData([...tvlGainers24HRSortedData].reverse())
   }, [tvlGainers24HRSortedData]);
+
   useEffect(() => {
     if (apeMode) getApeModeData().catch(errResp => console.error(errResp));
   }, [apeMode]);
@@ -110,7 +113,6 @@ export default function App() {
       setTVLGainers24HRSortedData([...pDexResp.data.sort((a, b) => {
         return sortGainers(a, b, 'TVL_USD_24hr');
       })]);
-      // setPDexData(pDexResp.data);
       console.log(pDexResp.data)
     }
   }
@@ -120,7 +122,7 @@ export default function App() {
     if (gainers24HRApeModeSortedData.length && mostActiveApeModeSortedData.length && newestListingApeModeSortedData.length) return;
     const apeModeData = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=ape');
     if (apeModeData.data) {
-      // const filterLowTvl = [...apeModeData.data.filter(token => token.current_TVL_USD >= 25000)]
+
       setGainers24HRApeModeSortedData([...apeModeData.data.sort((a, b) => {
         return sortGainers(a, b, 'Price_PctChg_24hr');
       })]);
@@ -130,7 +132,7 @@ export default function App() {
       setNewestListingApeModeSortedData([...apeModeData.data.sort((a, b) => {
         return sortByListingDate(a, b);
       })]);
-      // setPDexData(apeModeData.data);
+
       console.log(apeModeData.data)
     }
   }

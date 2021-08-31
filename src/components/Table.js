@@ -165,7 +165,6 @@ const roundNumber = (value, precision) => {
     return Math.round(value * multiplier) / multiplier;
 }
 
-
 const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
   const classes = useStyles();
   const [tableData] = React.useState(filteredTableData);
@@ -243,130 +242,82 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
     return (<span className={classes.listedTimeHrs}><span className={classes.listedTimeLabel}>LISTED: </span>{hoursDifference} hrs ago</span>)
   }
 
-  if (!apeMode) {
-    return (
-        <div className={classes.tableContainer}>
+  return (
+      <div className={apeMode ? classes.tableContainerApeMode : classes.tableContainer}>
 
-          {renderTableTitleIcon()}
-          <table className={classes.genTable}>
-            <tbody>
-            {
-              tableData.map((rToken, index) => {
-                //TODO: need this method
-                // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+        {renderTableTitleIcon()}
+        <table className={classes.genTable}>
+          <tbody>
+          {
+            tableData.map((rToken, index) => {
+              //TODO: need this method
+              // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
+              // let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
+              // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
+              // let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
+              // let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
+              const priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
 
-                let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
-                // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
-                let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
-                let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-                let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
-                return <tr  key={index}>
+              const tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC";
+              const priceChangePct24hr = rToken.Price_PctChg_24hr;
+              const priceChangeFiat24hr = rToken.current_mstbePrice;
+              const priceChangeFiat24hr4Decimal = rToken.current_mstbePrice.toFixed(4);
+              const iconAddress = `https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`
+              const tokenTickerSymbol = rToken.mdtTokenSymbol;
+              const volFormatedToKs = kFormatter(rToken.VolumeUSD_24hr);
+              const formatListingTimeInDaysHours = formatListingTime(rToken.DateListed);
+              const tvlCurrentFormatedToKs = kFormatter(rToken.current_TVL_USD);
+              const tvlChange24hrs = rToken.TVL_USD_24hr;
+              const tvlChangeFormatedToKs = kFormatter(tvlChange24hrs);
 
-                  <td className={classes.tdPriceChg}>
-                    <div className={classes.dashPriceChg}>
-                      <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
-                    </div>
-                    <div className={classes.dashPrice}>${rToken.current_mstbePrice.toFixed(4)}</div>
-                  </td>
-                  <td className={classes.tdTokenData}>
-                    <div className={classes.tokenSymbol}>
-                      <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
-                        alt="" className={classes.tokenIcon}
-                        onError={(e)=>{
-                          e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
-                        }}
-                      />
-                      {rToken.mdtTokenSymbol}
-                    </div>
-                    <div className={classes.dashVol}>
-                      <span className={classes.volLabel}>vol: </span>
-                      ${kFormatter(rToken.VolumeUSD_24hr)}
-                    </div>
-                  </td>
-                  <td className={classes.tdTVL24}>
-                    <div className={classes.totValLocked}>
-                      ${kFormatter(rToken.current_TVL_USD)}
-                    </div>
-                    <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
-                  </td>
-                  <td className={classes.tdTVLTitle}>
-                    <div className={classes.tvl}>
-                      TVL
-                    </div>
-                  </td>
+              return <tr  key={index}>
 
-                </tr>
-              })
-            }
-            </tbody>
-          </table>
-        </div>
-    );
-  }
-  if (apeMode) {
-    return (
-        <div className={classes.tableContainerApeMode}>
+                <td className={classes.tdPriceChg}>
+                  <div className={classes.dashPriceChg}>
+                    <div className={(priceChangePct24hr > 0) ? classes.gainNum : classes.negNum}>{(priceChangePct24hr > 0) ? '+' : null}{priceChange}%</div>
+                  </div>
+                  <div className={classes.dashPrice}>{apeMode ? priceChangeFiat24hr : priceChangeFiat24hr4Decimal}</div>
+                </td>
+                <td className={classes.tdTokenData}>
+                  <div className={classes.tokenSymbol}>
+                    <img src={iconAddress}
+                      alt="" className={classes.tokenIcon}
+                      onError={(e)=>{
+                        e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
+                      }}
+                    />
+                    {tokenTickerSymbol}
+                  </div>
+                  <div className={classes.dashVol}>
+                    <span className={classes.volLabel}>vol: </span>
+                    {volFormatedToKs}
+                  </div>
+                  {apeMode ?
+                    (<div className={classes.dashListed}>
+                      {formatListingTimeInDaysHours}
+                    </div>)
+                    :
+                    null
+                  }
+                </td>
+                <td className={classes.tdTVL24}>
+                  <div className={classes.totValLocked}>
+                    {tvlCurrentFormatedToKs}
+                  </div>
+                  <div className={(tvlChange24hrs > 0) ? classes.gainNumTVL : classes.negNumTVL}>{tvlChangeFormatedToKs}</div>
+                </td>
+                <td className={classes.tdTVLTitle}>
+                  <div className={classes.tvl}>
+                    TVL
+                  </div>
+                </td>
 
-          {renderTableTitleIcon()}
-          <table className={classes.genTable}>
-            <tbody>
-            {
-              tableData.map((rToken, index) => {
-                //TODO: need this method
-                // let mostLiquidExchange = MATIC_DexLinks(rToken.mostLiquidExchangeID)
-
-                let symbolLink = "/track/token.aspx?id=" + rToken.mdtTokenAddr + "&s=" + rToken.mdtTokenSymbol + "&ex=" + rToken.mostLiquidExchangeID;
-                // let swapLink = Replace(Replace(mostLiquidExchange.url_swap, "xxxTOKEN2xxx", rToken.mdtTokenAddr), "xxxTOKEN1xxx", "ETH")
-                let tokenSymbol = (rToken.mdtTokenSymbol === "MATIC" || rToken.mdtTokenSymbol === "WMATIC") ? "USDC" : "MATIC"
-                let swapLink = "https://app.slingshot.finance/trade/m/" + rToken.mdtTokenAddr + "/" + tokenSymbol;
-                let thisEx = rToken.mostLiquidExchangeID + 'quickChart_' + rToken.mdtTokenAddr
-                let priceChange =  roundNumber((rToken.Price_PctChg_24hr*100), 1);
-                return <tr  key={index}>
-
-                  <td className={classes.tdPriceChg}>
-                    <div className={classes.dashPriceChg}>
-                      <div className={(rToken.Price_PctChg_24hr > 0) ? classes.gainNum : classes.negNum}>{(rToken.Price_PctChg_24hr > 0) ? '+' : null}{priceChange}%</div>
-                    </div>
-                    <div className={classes.dashPrice}>${rToken.current_mstbePrice}</div>
-                  </td>
-                  <td className={classes.tdTokenData}>
-                    <div className={classes.tokenSymbol}>
-                      <img src={`https://polygondex.com/track/i/coinicons/by_0x/polygon/${rToken.mdtTokenAddr}.png`}
-                        alt="" className={classes.tokenIcon}
-                        onError={(e)=>{
-                          e.target.onerror = null; e.target.src="https://polygondex.com/track/i/coinicons/missingicon.png"
-                        }}
-                      />
-                      {rToken.mdtTokenSymbol}
-                    </div>
-                    <div className={classes.dashVol}>
-                      <span className={classes.volLabel}>vol: </span>
-                      ${kFormatter(rToken.VolumeUSD_24hr)}
-                    </div>
-                    <div className={classes.dashListed}>
-                      {formatListingTime(rToken.DateListed)}
-                    </div>
-                  </td>
-                  <td className={classes.tdTVL24}>
-                    <div className={classes.totValLocked}>
-                      ${kFormatter(rToken.current_TVL_USD)}
-                    </div>
-                    <div className={(rToken.TVL_USD_24hr > 0) ? classes.gainNumTVL : classes.negNumTVL}>${kFormatter(rToken.TVL_USD_24hr)}</div>
-                  </td>
-                  <td className={classes.tdTVLTitle}>
-                    <div className={classes.tvl}>
-                      TVL
-                    </div>
-                  </td>
-
-                </tr>
-              })
-            }
-            </tbody>
-          </table>
-        </div>
-    );
-  }
+              </tr>
+            })
+          }
+          </tbody>
+        </table>
+      </div>
+  );
 }
 export default Table;
