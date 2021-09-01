@@ -8,7 +8,7 @@ const useStyles = makeStyles({
     border: '1px solid #a59393',
     background: 'black',
     borderRadius: '10px',
-    margin: '12px',
+    margin: '8px',
     padding: '0 5px 5px',
     boxShadow: '3px 3px 3px #000',
     width: '30%',
@@ -165,7 +165,7 @@ const roundNumber = (value, precision) => {
     return Math.round(value * multiplier) / multiplier;
 }
 
-const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
+const TokenTable = ({filteredTableData, tableHeaderData, apeMode}) => {
   const classes = useStyles();
   const [tableData] = React.useState(filteredTableData);
 
@@ -320,4 +320,4 @@ const Table = ({filteredTableData, tableHeaderData, apeMode}) => {
       </div>
   );
 }
-export default Table;
+export default TokenTable;

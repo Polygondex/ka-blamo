@@ -6,8 +6,9 @@ import { Button } from '@material-ui/core';
 import { useMoralis } from 'react-moralis';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { XGrid } from '@material-ui/x-grid';
-import Table from "./components/Table";
+import TokenTable from "./components/TokenTable";
 import * as TableHeaderEnum from "./enums/TableHeaderEnum";
+import DexTable from "./components/DexTable";
 const axios = require('axios');
 
 
@@ -21,6 +22,19 @@ const useStyles = makeStyles({
   welcomeMsg: {
     margin: '12px',
     textAlign: 'center'
+  },
+  divMainDish: {
+    width: '100%'
+  },
+  homeLeftCol: {
+    width: '20%',
+    verticalAlign:'top',
+    display: 'table-cell'
+  },
+  homeRightCol: {
+    width: '80%',
+    verticalAlign:'top',
+    display: 'table-cell'
   },
 });
 
@@ -39,9 +53,14 @@ export default function App() {
   const [mostActiveApeModeSortedData, setMostActiveApeModeSortedData] = React.useState([]);
   const [newestListingApeModeSortedData, setNewestListingApeModeSortedData] = React.useState([]);
   const [gainers24HRApeModeSortedData, setGainers24HRApeModeSortedData] = React.useState([]);
+
+  const [polygonDexSortedData, setPolygonDexSortedData] = React.useState([]);
   useEffect(() => {
+    getPDEXTokenData()
+      .catch(errResp => console.error(errResp));
     getPDEXData()
-      .catch(errResp => console.error(errResp))
+      .catch(errResp => console.error(errResp));
+    console.log(polygonDexSortedData)
   }, []);
 
   useEffect(() => {
@@ -98,9 +117,19 @@ export default function App() {
   }
 
   const getPDEXData = async () => {
-    const pDexResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1');
+    const pDexResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=dexlist');
     if (pDexResp.data) {
-      const filterLowTvl = [...pDexResp.data.filter(token => token.current_TVL_USD >= 25000)]
+      console.log(pDexResp.data)
+      setPolygonDexSortedData([...pDexResp.data.sort((a, b) => {
+        return sortGainers(a, b, 'Volume24hrs');
+      })]);
+    }
+  }
+
+  const getPDEXTokenData = async () => {
+    const pDexTokenResp = await axios.get('https://polygondex.com/track/api/v1.aspx?apiMe=1');
+    if (pDexTokenResp.data) {
+      const filterLowTvl = [...pDexTokenResp.data.filter(token => token.current_TVL_USD >= 25000)]
       setGainers24HRSortedData([...filterLowTvl.sort((a, b) => {
         return sortGainers(a, b, 'Price_PctChg_24hr');
       })]);
@@ -110,10 +139,10 @@ export default function App() {
       setMostActiveSortedData([...filterLowTvl.sort((a, b) => {
         return sortGainers(a, b, 'VolumeUSD_24hr');
       })]);
-      setTVLGainers24HRSortedData([...pDexResp.data.sort((a, b) => {
+      setTVLGainers24HRSortedData([...pDexTokenResp.data.sort((a, b) => {
         return sortGainers(a, b, 'TVL_USD_24hr');
       })]);
-      console.log(pDexResp.data)
+      console.log(pDexTokenResp.data)
     }
   }
 
@@ -137,29 +166,39 @@ export default function App() {
     }
   }
 
-  const renderGenericTable = (tableData, headerEnum) => {
+  const renderGenericDexTable = (tableData, headerEnum) => {
     if (!tableData.length) return;
     return (
-      <Table
+      <DexTable
+          filteredTableData={tableData}
+          tableHeaderData={headerEnum}
+      />
+    )
+  }
+  const renderGenericTokenTable = (tableData, headerEnum) => {
+    if (!tableData.length) return;
+    return (
+      <TokenTable
           filteredTableData={tableData}
           tableHeaderData={headerEnum}
           apeMode={apeMode}
+          key={headerEnum}
       />
     )
   }
 
   const apeModeCharts = [
-    renderGenericTable(gainers24HRApeModeSortedData, TableHeaderEnum.GAINER_24HR),
-    renderGenericTable(newestListingApeModeSortedData, TableHeaderEnum.NEWEST_LISTING),
-    renderGenericTable(mostActiveApeModeSortedData, TableHeaderEnum.ACTIVE_24HR)
+    renderGenericTokenTable(gainers24HRApeModeSortedData, TableHeaderEnum.GAINER_24HR),
+    renderGenericTokenTable(newestListingApeModeSortedData, TableHeaderEnum.NEWEST_LISTING),
+    renderGenericTokenTable(mostActiveApeModeSortedData, TableHeaderEnum.ACTIVE_24HR)
   ];
   const regularCharts = [
-    renderGenericTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR),
-    renderGenericTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR),
-    renderGenericTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR),
-    renderGenericTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN),
-    renderGenericTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR),
-    renderGenericTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR),
+    renderGenericTokenTable(gainers24HRSortedData, TableHeaderEnum.GAINER_24HR),
+    renderGenericTokenTable(losers24HRSortedData, TableHeaderEnum.LOSER_24HR),
+    renderGenericTokenTable(mostActiveSortedData, TableHeaderEnum.ACTIVE_24HR),
+    renderGenericTokenTable(gainers10MINSortedData, TableHeaderEnum.GAINER_10MIN),
+    renderGenericTokenTable(tvlGainers24HRSortedData, TableHeaderEnum.TVL_UP_24HR),
+    renderGenericTokenTable(tvlLosers24HRSortedData, TableHeaderEnum.TVL_DOWN_24HR),
   ];
 
 
@@ -207,8 +246,16 @@ export default function App() {
       {/*    disableColumnMenu={true}*/}
       {/*  />*/}
       {/*</div>*/}
+      <div className={classes.divMainDish}>
+        <div className={classes.homeLeftCol}>
+          {renderGenericDexTable(polygonDexSortedData, TableHeaderEnum.TOP_DEXs)}
 
-      {!apeMode ? regularCharts : apeModeCharts}
+        </div>
+        <div className={classes.homeRightCol}>
+          {!apeMode ? regularCharts : apeModeCharts}
+        </div>
+
+      </div>
 
     </div>
   );
