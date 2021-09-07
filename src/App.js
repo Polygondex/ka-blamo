@@ -9,6 +9,7 @@ import { XGrid } from '@material-ui/x-grid';
 import TokenTable from "./components/TokenTable";
 import * as TableHeaderEnum from "./enums/TableHeaderEnum";
 import DexTable from "./components/DexTable";
+import MainCharts from "./components/MainCharts";
 const axios = require('axios');
 
 
@@ -36,6 +37,13 @@ const useStyles = makeStyles({
     verticalAlign:'top',
     display: 'table-cell'
   },
+  majorCharts: {
+    width: '100%',
+    padding: '8px 0',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
 });
 
 export default function App() {
@@ -223,6 +231,11 @@ export default function App() {
     { title: 'transaction_index', field: 'transaction_index' }
   ];
 
+  // setTimeout(function () { loadMajorsChart("ethereum", "ETH", "/track/i/majors-eth.png") }, 500);
+  // setTimeout(function () { loadMajorsChart("matic-network", "MATIC", "/track/i/majors-matic.png") }, 700);
+  // setTimeout(function () { loadMajorsChart("quick", "QUICK", "/track/i/majors-quick.png") }, 1000);
+
+
   return (
     <div className={'primaryBackground'}>
       <NavBar tokenList={gainers24HRSortedData} setApeMode={setApeMode} apeMode={apeMode}/>
@@ -246,6 +259,24 @@ export default function App() {
       {/*    disableColumnMenu={true}*/}
       {/*  />*/}
       {/*</div>*/}
+      <div className={classes.majorCharts}>
+
+        <MainCharts
+            coinID={"ethereum"}
+            symbol={"ETH"}
+            iconURL={"/track/i/majors-eth.png"}
+        />
+        <MainCharts
+            coinID={"matic-network"}
+            symbol={"MATIC"}
+            iconURL={"/track/i/majors-matic.png"}
+        />
+        <MainCharts
+            coinID={"quick"}
+            symbol={"QUICK"}
+            iconURL={"/track/i/majors-quick.png"}
+        />
+      </div>
       <div className={classes.divMainDish}>
         <div className={classes.homeLeftCol}>
           {renderGenericDexTable(polygonDexSortedData, TableHeaderEnum.TOP_DEXs)}
@@ -254,6 +285,7 @@ export default function App() {
         <div className={classes.homeRightCol}>
           {!apeMode ? regularCharts : apeModeCharts}
         </div>
+
 
       </div>
 

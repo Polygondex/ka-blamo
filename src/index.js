@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { MoralisProvider } from 'react-moralis';
 import 'font-awesome/css/font-awesome.min.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+window.anychart.licenseKey('portoasis-4759bd22-16459337');
 
 ReactDOM.render(
   <MoralisProvider
