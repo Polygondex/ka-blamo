@@ -136,8 +136,14 @@ const MainChart = (props) => {
   }
 
   function drawChartType1(QuoteSymbol, JSONdata, containerObjID) {
-    const chartStart = '2021-09-06';
-    const chartEnd = '2021-09-09';
+    const currentDatePlusOne = new Date();
+    currentDatePlusOne.setDate(currentDatePlusOne.getDate() +1)
+    const currentDatePlusOneNow = `${currentDatePlusOne.getFullYear()}-${currentDatePlusOne.getMonth()+1}-${currentDatePlusOne.getDate()}`
+    const threeDaysAgo = new Date()
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const currentDateThreeDaysAgo = `${threeDaysAgo.getFullYear()}-${threeDaysAgo.getMonth()+1}-${threeDaysAgo.getDate()}`
+    const chartStart = currentDateThreeDaysAgo;
+    const chartEnd = currentDatePlusOneNow;
     const allBGs = '#0000000d'
     const linesGrid = '#1415170f'
     const linesHover = '#e8e8e8'
