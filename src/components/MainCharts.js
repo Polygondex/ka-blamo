@@ -2,7 +2,7 @@ import React, {Fragment, useEffect} from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import AnyChart from 'anychart-react';
 import anychart from 'anychart';
-import axios from "axios";
+import axios from 'axios';
 
 const useStyles = makeStyles({
   majorsChartBox: {
@@ -99,28 +99,23 @@ const MainChart = (props) => {
 
   const [PriceChng, setPriceChng] = React.useState(null)
   const [PriceChngPct, setPriceChngPct] = React.useState(null);
-  const [classColors, setclassColors] = React.useState("gain");
-  const [pricePrefix, setpricePrefix] = React.useState("+");
+  const [classColors, setclassColors] = React.useState('gain');
+  const [pricePrefix, setpricePrefix] = React.useState('+');
 
   useEffect(() => {
     if (chartData.length) return;
     getPDEXTokenData().catch(err => console.error(err));
-    // if (getChartResp) {
-    //   getChartColorData(chartData)
-    // }
   }, [chartData])
 
   const getPDEXTokenData = async () => {
 
     const tokenData = await axios.get(`https://api.coingecko.com/api/v3/coins/${coinID}/ohlc?vs_currency=usd&days=1`);
-    console.log(tokenData.data)
     if (tokenData.data?.length) {
       console.log(tokenData.data)
       setChartData(tokenData.data);
       getChartColorData(tokenData.data)
       return true;
     }
-
   }
 
   const getChartColorData = (chartData) => {
@@ -130,13 +125,12 @@ const MainChart = (props) => {
     const tempPriceClose = chartData[chartData.length - 1][4];
 
     setPriceChng(tempPriceClose-tempPriceOpen)
-    console.log()
     const tempPriceChng = tempPriceClose-tempPriceOpen
     setPriceChngPct(((tempPriceChng / tempPriceOpen) * 100).toFixed(2));
 
     if (tempPriceChng < 0) {
-      setclassColors("loss");
-      setpricePrefix("");
+      setclassColors('loss');
+      setpricePrefix('');
     }
     return pricePrefix
   }
@@ -144,22 +138,21 @@ const MainChart = (props) => {
   function drawChartType1(QuoteSymbol, JSONdata, containerObjID) {
     const chartStart = '2021-09-06';
     const chartEnd = '2021-09-09';
-    const allBGs = "#0000000d"
-    const linesGrid = "#1415170f"
-    const linesHover = "#e8e8e8"
-    const lineClose = "#e8e8e8"
+    const allBGs = '#0000000d'
+    const linesGrid = '#1415170f'
+    const linesHover = '#e8e8e8'
+    const lineClose = '#e8e8e8'
 
-    const colorUP_stroke = "rgba(255, 255, 255, 0.7)"
-    const colorUP_fill = "rgba(2, 192, 118, 0.7)"
+    const colorUP_stroke = 'rgba(255, 255, 255, 0.7)'
+    const colorUP_fill = 'rgba(2, 192, 118, 0.7)'
 
-    const colorDOWN_stroke = "rgba(255, 255, 255, 0.8)"
-    const colorDOWN_fill = "#f84960"
+    const colorDOWN_stroke = 'rgba(255, 255, 255, 0.8)'
+    const colorDOWN_fill = '#f84960'
 
 
     const dataTable = anychart.data.table();
     dataTable.addData(JSONdata);
 
-    const mapping = dataTable.mapAs({ 'open': 1, 'high': 2, 'low': 3, 'close': 4, 'volume': 5 });
     let chart = anychart.stock();
     const plot = chart.plot(0);
 
@@ -167,8 +160,7 @@ const MainChart = (props) => {
 
     const priceIndicator = plot.priceIndicator();
     priceIndicator.value('last-visible');
-    //priceIndicator.label({background: "#000", fontColor : "#fff",  stroke : "#2d2d2d"});
-    priceIndicator.stroke({thickness: 0.8, color : lineClose, dash : "2 2"});
+    priceIndicator.stroke({thickness: 0.8, color : lineClose, dash : '2 2'});
 
 
     priceIndicator.risingStroke(colorUP_fill);
@@ -179,10 +171,9 @@ const MainChart = (props) => {
     //---------------------------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------------------------------------------
 
-    //series = plot.candlestick(mapping).name(QuoteSymbol);
     let series = plot.splineArea(dataTable.mapAs({ 'value': 4 })).name(QuoteSymbol)
 
-    if (pricePrefix == "+") {
+    if (pricePrefix == '+') {
       series.fill(['rgba(2, 192, 118, 0.0)',colorUP_fill],90);
       series.stroke(colorUP_stroke);
     }
@@ -191,16 +182,7 @@ const MainChart = (props) => {
       series.stroke(colorDOWN_stroke);
     }
 
-    /*
-     series.risingStroke(colorUP_stroke);
-     series.risingFill(colorUP_fill);
-
-     series.fallingStroke(colorDOWN_stroke);
-     series.fallingFill(colorDOWN_fill);
-     series.legendItem().iconType('risingfalling');
-     */
-    series.pointWidth("50%");
-
+    series.pointWidth('50%');
 
     //---------------------------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------------------------------------------------------
@@ -208,24 +190,24 @@ const MainChart = (props) => {
     plot.xGrid().enabled(true);
     plot.xGrid().stroke({
       color: linesGrid,
-      dash: "3 5"
+      dash: '3 5'
     });
 
     plot.yGrid().enabled(true);
     plot.yGrid().stroke({
       color: linesGrid,
-      dash: "3 5"
+      dash: '3 5'
     });
 
     plot.xMinorGrid().stroke({
       color: linesGrid,
-      dash: "3 5"
+      dash: '3 5'
     });
 
-    chart.crosshair().displayMode("float");
+    chart.crosshair().displayMode('float');
 
-    plot.crosshair().xStroke(linesHover, 1, "10 5", "round");
-    plot.crosshair().yStroke(linesHover, 1, "10 5", "round");
+    plot.crosshair().xStroke(linesHover, 1, '10 5', 'round');
+    plot.crosshair().yStroke(linesHover, 1, '10 5', 'round');
 
     chart.background().fill(allBGs);
 
@@ -247,30 +229,6 @@ const MainChart = (props) => {
     return chart;
   }
 
-
-  // const loadMajorsChart = (coinID, symbol, iconURL) => {
-
-    // anychart.data.loadJsonFile('https://api.coingecko.com/api/v3/coins/' + coinID + '/ohlc?vs_currency=usd&days=1', function (data) {
-
-
-      // const PriceOPEN = data[0][4];
-      // const PriceCLOSE = data[data.length - 1][4];
-      //
-      // const PriceChng = (PriceCLOSE-PriceOPEN)
-      // const PriceChngPct = ((PriceChng) / PriceOPEN) * 100
-      //
-      // let classColors = "gain";
-      // let pricePrefix = "+";
-      // if (PriceChng < 0) {
-      //   classColors = "loss";
-      //   pricePrefix = "";
-      // }
-      // drawChartType1("divMAJORS_" + symbol, symbol, data, pricePrefix);
-
-    // });
-
-  // }
-  console.log(PriceChng, PriceOPEN, ((PriceChng) / PriceOPEN))
   if (chartData.length && classColors) {
     return (
         <div className={classes.majorsChartBox}>
@@ -284,11 +242,7 @@ const MainChart = (props) => {
             <div className={classes.majorsPriceAndChg}>
               <div className={classes.majorsPrice}>${chartData[chartData.length - 1][4].toFixed(2)}</div>
               <div className={classes[`majorsPriceChgPct_${classColors}`]}>{pricePrefix} {PriceChngPct} %</div>
-              {/*<div class='majorsPriceChgPct_" + classColors + "'>" + pricePrefix + PriceChngPct.toFixed(2) + "%</div>"*/}
             </div>
-
-            {/*<div id={`coinChart_${symbol}`}></div>*/}
-
           </div>
           <AnyChart
               height={200}
